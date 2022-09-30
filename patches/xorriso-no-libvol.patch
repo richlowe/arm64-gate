@@ -1,0 +1,157 @@
+diff -ru xorriso-1.5.4/configure xorriso-1.5.4-new/configure
+--- xorriso-1.5.4/configure	2021-01-30 08:30:52.000000000 +0000
++++ xorriso-1.5.4-new/configure	2022-11-04 20:01:39.709592893 +0000
+@@ -12730,7 +12730,6 @@
+       ;;
+     *-solaris*)
+       ARCH=solaris
+-      LIBBURN_ARCH_LIBS=-lvolmgt
+       ;;
+     *)
+       ARCH=
+diff -ru xorriso-1.5.4/libburn/sg-solaris.c xorriso-1.5.4-new/libburn/sg-solaris.c
+--- xorriso-1.5.4/libburn/sg-solaris.c	2021-01-30 08:30:50.000000000 +0000
++++ xorriso-1.5.4-new/libburn/sg-solaris.c	2022-11-04 20:01:36.735032683 +0000
+@@ -47,7 +47,7 @@
+ sg_shutdown()           performs global finalizations and releases globally
+                         acquired resources.
+ 
+-sg_give_next_adr()      iterates over the set of potentially useful drive 
++sg_give_next_adr()      iterates over the set of potentially useful drive
+                         address strings.
+ 
+ scsi_enumerate_drives() brings all available, not-whitelist-banned, and
+@@ -56,7 +56,7 @@
+ sg_dispose_drive()      finalizes adapter specifics of struct burn_drive
+                         on destruction. Releases resources which were acquired
+                         underneath scsi_enumerate_drives().
+- 
++
+ sg_drive_is_open()      tells whether libburn has the given drive in use.
+ 
+ sg_grab()               opens the drive for SCSI commands and ensures
+@@ -116,7 +116,6 @@
+ #include <sys/statvfs.h>
+ #endif /* Libburn_os_has_stavtfS */
+ 
+-#include <volmgt.h>
+ #include <sys/dkio.h>
+ #include <sys/vtoc.h>
+ 
+@@ -265,28 +264,6 @@
+ 	*dev_to_open = NULL;
+ 	curr_name = path;
+ 
+-	if (! volmgt_running())
+-		goto set_name;
+-	sym_name = volmgt_symname(path); 
+-	sprintf(msg, "Volume Management symbolic name: '%s' -> %s",
+-			path, sym_name == NULL ? "NULL" : sym_name);
+-	libdax_msgs_submit(libdax_messenger, -1,
+-			0x00000002,
+-			LIBDAX_MSGS_SEV_DEBUG, LIBDAX_MSGS_PRIO_HIGH,
+-			msg, 0, 0);
+-	if (sym_name != NULL)
+-		media_name = media_findname(sym_name);
+-	else
+-		media_name = media_findname(path);
+-	if (media_name != NULL)
+-		curr_name = media_name;
+-	sprintf(msg, "Media name: %s -> %s",
+-			sym_name == NULL ? path : sym_name,
+-			media_name == NULL ? "NULL" : media_name);
+-	libdax_msgs_submit(libdax_messenger, -1,
+-			0x00000002,
+-			LIBDAX_MSGS_SEV_DEBUG, LIBDAX_MSGS_PRIO_HIGH,
+-			msg, 0, 0);
+ set_name:
+ 	BURN_ALLOC_MEM(*dev_to_open, char, strlen(curr_name) + 1);
+ 	strcpy(*dev_to_open, curr_name);
+@@ -303,7 +280,7 @@
+ 
+ static int next_enum_cXtYdZs2(burn_drive_enumerator_t *idx,
+ 				char adr[], int adr_size, int flag)
+-{ 
++{
+ 	int busno, tgtno, lunno, ret, fd = -1, volpath_size = 160, os_errno;
+ 	char *volpath = NULL, *msg = NULL, *dev_to_open = NULL;
+ 	struct dirent *entry;
+@@ -489,7 +466,7 @@
+     @param msg   returns ids and/or error messages of eventual helpers
+     @param flag  unused yet, submit 0
+     @return      1 = success, <=0 = failure
+-*/ 
++*/
+ int sg_initialize(char msg[1024], int flag)
+ {
+ 	return sg_id_string(msg, 0);
+@@ -500,7 +477,7 @@
+     needed operating system facilities. Releases globally acquired resources.
+     @param flag  unused yet, submit 0
+     @return      1 = success, <=0 = failure
+-*/ 
++*/
+ int sg_shutdown(int flag)
+ {
+ 	return 1;
+@@ -573,7 +550,7 @@
+ 		if (ret <= 0)
+ 	break;
+ 		if (burn_drive_is_banned(buf))
+-	continue; 
++	continue;
+ 		sg_obtain_scsi_adr(buf, &i_bus_no, &i_host_no,
+ 				&i_channel_no, &i_target_no, &i_lun_no);
+ 		enumerate_common(buf,
+@@ -603,8 +580,8 @@
+     to external interference on your system - obtains an exclusive access lock
+     on the drive. (Note: this is not physical tray locking.)
+     A drive that has been opened with sg_grab() will eventually be handed
+-    over to sg_release() for closing and unreserving. 
+-*/  
++    over to sg_release() for closing and unreserving.
++*/
+ int sg_grab(struct burn_drive *d)
+ {
+ 	char *msg = NULL, *dev_to_open = NULL;
+@@ -679,7 +656,7 @@
+              implements the demanded functionality.
+ */
+ /** Gives up the drive for SCSI commands and releases eventual access locks.
+-    (Note: this is not physical tray locking.) 
++    (Note: this is not physical tray locking.)
+ */
+ int sg_release(struct burn_drive *d)
+ {
+@@ -804,7 +781,7 @@
+ 			done = 1;
+ 		if (!done)
+ 			spc_register_retry(c);
+-					
++
+ 	} /* end of retry-loop */
+ 
+ 	return 1;
+@@ -886,7 +863,7 @@
+ 
+ 
+ /* Return 1 if the given path leads to a regular file or a device that can be
+-   fseeked, read, and possibly written with 2 kB granularity. 
++   fseeked, read, and possibly written with 2 kB granularity.
+ */
+ int burn_os_is_2k_seekrw(char *path, int flag)
+ {
+@@ -958,7 +935,7 @@
+ 	} else
+ 		{ret = 0; goto ex;}
+ 
+-	if (testpath[0]) {	
++	if (testpath[0]) {
+ 
+ #ifdef Libburn_os_has_statvfS
+ 
+@@ -1015,4 +992,3 @@
+ 	free(buffer);
+ 	return 1;
+ }
+-

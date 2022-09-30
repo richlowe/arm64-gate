@@ -1,0 +1,8 @@
+ckfw/ckbi/aarch64/mapfile-vers
+ckfw/ckbi/aarch64/pics/certdata.c
+freebl/aarch64/mapfile-vers
+smime/aarch64/mapfile-vers
+softoken/aarch64/mapfile-vers
+sqlite/aarch64/mapfile-vers
+ssl/aarch64/mapfile-vers
+util/aarch64/mapfile-vers
