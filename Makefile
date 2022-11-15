@@ -235,7 +235,7 @@ $(STAMPS)/zlib-stamp: libc ssp_ns gcc
 	      AR=$(CROSS)/bin/aarch64-solaris2.11-ar \
 	      RANLIB=$(CROSS)/bin/aarch64-solaris2.11-ar \
 	      LDSHARED="$(CROSS)/bin/aarch64-solaris2.11-gcc -shared" \
-	      CFLAGS="--sysroot=$(SYSROOT)" \
+	      CFLAGS="--sysroot=$(SYSROOT) -fpic" \
 	  ../../zlib-1.2.12/configure --shared --prefix=$(SYSROOT)/usr && \
 	  gmake -j $(MAX_JOBS) && \
 	  gmake -j $(MAX_JOBS) install) && \
