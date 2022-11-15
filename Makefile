@@ -231,20 +231,22 @@ $(STAMPS)/libmp-stamp: libc ssp_ns gcc
 zlib: $(STAMPS)/zlib-stamp
 $(STAMPS)/zlib-stamp: libc ssp_ns gcc
 	(cd build/zlib && \
-	  env CC=$(CROSS)/bin/aarch64-solaris2.11-gcc \
+	  env PATH="$(CROSS)/bin:$$PATH" \
+	      CC=$(CROSS)/bin/aarch64-solaris2.11-gcc \
 	      AR=$(CROSS)/bin/aarch64-solaris2.11-ar \
 	      RANLIB=$(CROSS)/bin/aarch64-solaris2.11-ar \
 	      LDSHARED="$(CROSS)/bin/aarch64-solaris2.11-gcc -shared" \
 	      CFLAGS="--sysroot=$(SYSROOT) -fpic" \
 	  ../../zlib-1.2.12/configure --shared --prefix=$(SYSROOT)/usr && \
-	  gmake -j $(MAX_JOBS) && \
-	  gmake -j $(MAX_JOBS) install) && \
+	  env PATH="$(CROSS)/bin:$$PATH" gmake -j $(MAX_JOBS) && \
+	  env PATH="$(CROSS)/bin:$$PATH" gmake -j $(MAX_JOBS) install) && \
 	touch $@
 
 libxml2: $(STAMPS)/libxml2-stamp
 $(STAMPS)/libxml2-stamp: libc libm libmp libmd zlib ssp_ns gcc
 	(cd build/libxml2 && \
-	 env CC=$(CROSS)/bin/aarch64-solaris2.11-gcc \
+	env PATH="$(CROSS)/bin:$$PATH" \
+	    CC=$(CROSS)/bin/aarch64-solaris2.11-gcc \
 	    CFLAGS="--sysroot=$(SYSROOT)" \
 	 ../../libxml2-2.9.9/configure \
 	    --host=aarch64-solaris2.11 \
@@ -253,21 +255,22 @@ $(STAMPS)/libxml2-stamp: libc libm libmp libmd zlib ssp_ns gcc
 	    --without-zlib \
 	    --without-lzma \
 	    --without-python && \
-	 gmake -j $(MAX_JOBS) LDFLAGS+="-lsocket -lnsl -lmd" && \
-	 gmake -j $(MAX_JOBS) install) && \
+	 env PATH="$(CROSS)/bin:$$PATH" gmake -j $(MAX_JOBS) LDFLAGS+="-lsocket -lnsl -lmd" && \
+	 env PATH="$(CROSS)/bin:$$PATH" gmake -j $(MAX_JOBS) install) && \
 	touch $@
 
 idnkit: $(STAMPS)/idnkit-stamp
 $(STAMPS)/idnkit-stamp: libc ssp_ns gcc
 	(cd build/idnkit && \
-	 env CC=$(CROSS)/bin/aarch64-solaris2.11-gcc \
+	 env PATH="$(CROSS)/bin:$$PATH" \
+	 CC=$(CROSS)/bin/aarch64-solaris2.11-gcc \
 	    CFLAGS="--sysroot=$(SYSROOT)" \
 	 ../../idnkit-2.3/configure \
 	    --host=aarch64-solaris2.11 \
 	    --with-sysroot=$(SYSROOT) \
 	    --prefix=$(SYSROOT)/usr && \
-	 gmake -j $(MAX_JOBS) && \
-	 gmake -j $(MAX_JOBS) install) && \
+	 env PATH="$(CROSS)/bin:$$PATH" gmake -j $(MAX_JOBS) && \
+	 env PATH="$(CROSS)/bin:$$PATH" gmake -j $(MAX_JOBS) install) && \
 	touch $@
 
 ssp_ns: $(STAMPS)/ssp_ns-stamp
@@ -299,16 +302,18 @@ $(STAMPS)/libc-filters-stamp: libc gcc
 libstdc++: $(STAMPS)/libstdc++-stamp
 $(STAMPS)/libstdc++-stamp: libc libc-filters ssp_ns gcc
 	(cd build/libstdc++ && \
-	 env CC=$(CROSS)/bin/aarch64-solaris2.11-gcc \
-	     CXX=$(CROSS)/bin/aarch64-solaris2.11-g++ \
-	    CFLAGS="--sysroot=$(SYSROOT)" \
+	 env PATH="$(CROSS)/bin:$$PATH" \
+	    CC=$(CROSS)/bin/aarch64-solaris2.11-gcc \
+	    CXX=$(CROSS)/bin/aarch64-solaris2.11-g++ \
+	    CFLAGS="--sysroot=$(SYSROOT) -mno-outline-atomics" \
+	    CXXFLAGS="--sysroot=$(SYSROOT) -mno-outline-atomics" \
 	    LDFLAGS="--sysroot=$(SYSROOT)" \
 	    CPPFLAGS="-I$(SYSROOT)/usr/include" \
 	../../gcc/libstdc++-v3/configure \
 	    --host=aarch64-solaris2.11 \
 	    --prefix=$(SYSROOT)/usr && \
-	gmake -j $(MAX_JOBS) && \
-	gmake -j $(MAX_JOBS) install) && \
+	env PATH="$(CROSS)/bin:$$PATH" gmake -j $(MAX_JOBS) && \
+	env PATH="$(CROSS)/bin:$$PATH" gmake -j $(MAX_JOBS) install) && \
 	touch $@
 
 nspr: $(STAMPS)/nspr-stamp
