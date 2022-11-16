@@ -18,6 +18,9 @@ MAX_JOBS= 12
 
 BLDENV= $(PWD)/illumos-gate/usr/src/tools/scripts/bldenv
 
+# OmniOS puts GMP headers in a weird place, know where to find them.
+GMPINCDIR= /usr/include/gmp
+
 # XXXARM: We can't .KEEP_STATE because something confuses everything
 # (directory changes in rules?) and it gets bogus dependencies and always
 # rebuilds everything (which, to be fair, often happens anyway).
@@ -104,7 +107,7 @@ $(STAMPS)/binutils-gdb-stamp:
 	    --target=aarch64-solaris2.11 \
 	    --prefix=$(CROSS) \
 	    --enable-initfini-array && \
-	gmake -j $(MAX_JOBS) && \
+	gmake -j $(MAX_JOBS) CPPFLAGS+='-I$(GMPINCDIR)' && \
 	gmake -j $(MAX_JOBS) install) && \
 	touch $@
 
@@ -123,6 +126,7 @@ gcc: $(STAMPS)/gcc-stamp
 $(STAMPS)/gcc-stamp: sgs binutils-gdb
 	(cd $(BUILDS)/gcc; \
 	../../gcc/configure \
+	    --with-gmp-include=$(GMPINCDIR) \
 	    --target=aarch64-solaris2.11 \
 	    --with-abi=lp64 \
 	    --prefix=$(CROSS) \
@@ -165,8 +169,10 @@ $(STAMPS)/libc-stamp: ssp_ns gcc
 	(cd illumos-gate && \
 	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libc; make install' && \
 	mkdir -p $(SYSROOT)/usr/lib && \
+	rm -f $(SYSROOT)/usr/lib/libc.* \
 	cp -a proto/root_aarch64/usr/lib/libc* $(SYSROOT)/usr/lib/ && \
 	mkdir -p $(SYSROOT)/lib && \
+	rm -f $(SYSROOT)/lib/libc.* \
 	cp -a proto/root_aarch64/lib/libc* $(SYSROOT)/lib/) && \
 	touch $@
 
@@ -175,8 +181,10 @@ $(STAMPS)/libm-stamp: ssp_ns gcc
 	(cd illumos-gate && \
 	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libm_aarch64; make install' && \
 	mkdir -p $(SYSROOT)/usr/lib && \
+	rm -f $(SYSROOT)/usr/lib/libm.* \
 	cp -a proto/root_aarch64/usr/lib/libm.* $(SYSROOT)/usr/lib/ && \
 	mkdir -p $(SYSROOT)/lib && \
+	rm -f $(SYSROOT)/lib/libm.* \
 	cp -a proto/root_aarch64/lib/libm.* $(SYSROOT)/lib/) && \
 	touch $@
 
