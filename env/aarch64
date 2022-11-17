@@ -133,6 +133,7 @@ export GLD=${CODEMGR_WS}/../cross/bin/aarch64-solaris2.11-ld
 export OBJCOPY=${CODEMGR_WS}/../cross/bin/aarch64-solaris2.11-objcopy
 export ANSI_CPP=${CODEMGR_WS}/../cross/bin/aarch64-solaris2.11-cpp
 export MKIMAGE=${CODEMGR_WS}/../build/u-boot/tools/mkimage
+export DTC=${CODEMGR_WS}/../cross/bin/dtc
 
 # XXXARM: No cross, very broken
 # comment to disable smatch

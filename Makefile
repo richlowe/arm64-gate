@@ -28,6 +28,7 @@ GMPINCDIR= /usr/include/gmp
 SETUP_TARGETS =		\
 	binutils-gdb 	\
 	crt		\
+	dtc		\
 	gcc		\
 	idnkit		\
 	libc		\
@@ -50,6 +51,7 @@ SETUP_TARGETS =		\
 
 DOWNLOADS=		\
 	binutils-gdb	\
+	dtc		\
 	gcc		\
 	idnkit		\
 	illumos-gate	\
@@ -94,6 +96,12 @@ download-illumos-gate: $(ARCHIVES)
 
 download-u-boot: $(ARCHIVES)
 	git clone --shallow-since=2019-01-01 -b v2022.10 https://github.com/u-boot/u-boot/
+
+# XXXARM: We specify what we extract, because the release tarball contains a
+# GNU tar-ism we don't understand.
+download-dtc: $(ARCHIVES)
+	wget -O archives/dtc-1.6.1.tar.gz https://git.kernel.org/pub/scm/utils/dtc/dtc.git/snapshot/dtc-1.6.1.tar.gz
+	tar xf archives/dtc-1.6.1.tar.gz dtc-1.6.1
 
 download-xorriso: $(ARCHIVES)
 	wget -O archives/xorriso-1.5.4.pl02.tar.gz https://www.gnu.org/software/xorriso/xorriso-1.5.4.pl02.tar.gz
@@ -400,6 +408,18 @@ $(STAMPS)/u-boot-stamp:
 	    HOSTCC="gcc -m64" \
 	    HOSTCFLAGS+="-I/opt/ooce/include" \
 	    HOSTLDLIBS+="-L/opt/ooce/lib/amd64 -lnsl -lsocket" tools && \
+	touch $@
+
+dtc: $(STAMPS)/dtc-stamp
+$(STAMPS)/dtc-stamp:
+	cd dtc-1.6.1 && \
+	gmake NO_YAML=1 \
+	    NO_PYTHON=1 \
+	    SHAREDLIB_LDFLAGS="-shared -Wl,-soname" && \
+	gmake PREFIX=$(CROSS) \
+	    NO_YAML=1 \
+	    NO_PYTHON=1 \
+	    INSTALL=/usr/gnu/bin/install install && \
 	touch $@
 
 illumos: $(STAMPS)/illumos-stamp
