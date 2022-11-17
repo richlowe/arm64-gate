@@ -12,7 +12,6 @@ easy, if not pleasant, at the current time.
 - An illumos system
 - A compilation environment, headers, compiler, etc.
 - `sudo` (pkg:/security/sudo)
-- `sgdisk` (pkg:/system/storage/gptfdisk)
 - `mkisofs` (pkg:/media/cdrtools)
 - `rsync` (pkg:/network/rsync)
 - Hopefully nothing else I forgot
@@ -29,8 +28,7 @@ To build there are three-ish steps
    `nightly`).  The environment file is in `env/aarch64` in this directory, and is what gets
    used for bootstrapping.
 1. `make disk` -- Build the disk image which you can give to `qemu(1)`
-    (this will complain about partitions and stuff, ignore it).  This will
-    also ask for your password, so if you just run `make disk` and let
+	This will also ask for your password, so if you just run `make disk` and let
     dependencies take over, that won't go great.
 
 This is rough around the edges, particularly regarding `Makefile` dependencies

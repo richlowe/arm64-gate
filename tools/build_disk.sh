@@ -17,15 +17,22 @@ mkdir -p $PWD/qemu-setup
 
 mkfile 2g $DISK
 
-# At present, the hacked booter needs normal partitions etc.
-sgdisk -g -e --clear --new=1:2048: \
-       --change-name=1:solaris \
-       --typecode=1:6A85CF4D-1DD2-11B2-99A6-080020736631 $DISK
-
 BASE_DEVICE=$(sudo lofiadm -la $DISK)
-PARTITION=${BASE_DEVICE%p0}s0
+RAW_DEVICE=${BASE_DEVICE/dsk/rdsk}
+SLICE=${BASE_DEVICE/p0/s0}
 
-sudo zpool create -t $POOL -dm $MNT $POOL $PARTITION
+# Taken from OmniOS kayak, note that this leaves s2 and s0 overlapping (which,
+# well...) and so requires zpool create -f, which I don't like.
+sudo fdisk -B $RAW_DEVICE
+# Create slice 0 covering all of the non-reserved space
+OIFS="$IFS"; IFS=" ="
+set -- $(sudo prtvtoc -f $RAW_DEVICE)
+IFS="$OIFS"
+# FREE_START=2048 FREE_SIZE=196608 FREE_COUNT=1 FREE_PART=...
+start=$2; size=$4
+sudo fmthard -d 0:2:01:$start:$size $RAW_DEVICE
+
+sudo zpool create -f -t $POOL -dm $MNT $POOL $SLICE
 sudo zfs create -o canmount=noauto $POOL/ROOT
 sudo zfs create $POOL/$ROOTFS
 sudo pkg image-create -F --variant variant.arch=aarch64 $MNT/$ROOTFS
