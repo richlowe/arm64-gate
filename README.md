@@ -14,6 +14,11 @@ easy, if not pleasant, at the current time.
 - `sudo` (pkg:/security/sudo)
 - `mkisofs` (pkg:/media/cdrtools)
 - `rsync` (pkg:/network/rsync)
+- OpenSSL 1.1 or compatible (pkg:/library/security/openssl-11)
+  (on OpenIndiana this may require `sudo pkg set-mediator -V 1.1 openssl`)
+- `swig` (pkg:/developer/swig)
+- GnuTLS (pkg:/library/gnutls-3, pkg:/ooce/library/gnutls on omnios)
+- GNU `install` (pkg:/file/gnu-coreutils)
 - Hopefully nothing else I forgot
 
 ## Building

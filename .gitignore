@@ -11,12 +11,13 @@ zlib-1.2.12/
 libressl-3.6.1/
 xorriso-1.5.4/
 
+
 illumos-gate/
 gcc/
 binutils-gdb/
 nspr/
 nss/
-
+u-boot/
 
 cross/
 sysroot/

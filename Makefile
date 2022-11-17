@@ -44,6 +44,7 @@ SETUP_TARGETS =		\
 	nss		\
 	sgs		\
 	ssp_ns		\
+	u-boot		\
 	xorriso		\
 	zlib
 
@@ -56,6 +57,7 @@ DOWNLOADS=		\
 	libxml2		\
 	nspr		\
 	nss		\
+	u-boot		\
 	xorriso		\
 	zlib
 
@@ -89,6 +91,9 @@ download-nspr: $(ARCHIVES)
 
 download-illumos-gate: $(ARCHIVES)
 	git clone -b arm64-gate https://github.com/richlowe/illumos-gate
+
+download-u-boot: $(ARCHIVES)
+	git clone --shallow-since=2019-01-01 -b v2022.10 https://github.com/u-boot/u-boot/
 
 download-xorriso: $(ARCHIVES)
 	wget -O archives/xorriso-1.5.4.pl02.tar.gz https://www.gnu.org/software/xorriso/xorriso-1.5.4.pl02.tar.gz
@@ -381,6 +386,20 @@ $(STAMPS)/xorriso-stamp: libc libc-filters ssp_ns gcc
 	    --prefix=$(SYSROOT)/usr && \
 	env PATH="$(CROSS)/bin/:$$PATH" gmake -j $(MAX_JOBS) && \
 	env PATH="$(CROSS)/bin/:$$PATH" gmake -j $(MAX_JOBS) install) && \
+	touch $@
+
+u-boot: $(STAMPS)/u-boot-stamp
+$(STAMPS)/u-boot-stamp:
+	cd u-boot && \
+	gmake V=1 O=$(PWD)/build/u-boot \
+	    HOSTCC="gcc -m64" \
+	    HOSTCFLAGS+="-I/opt/ooce/include" \
+	    HOSTLDLIBS+="-L/opt/ooce/lib/amd64 -lnsl -lsocket" \
+	    sandbox_defconfig && \
+	gmake V=1 O=$(PWD)/build/u-boot \
+	    HOSTCC="gcc -m64" \
+	    HOSTCFLAGS+="-I/opt/ooce/include" \
+	    HOSTLDLIBS+="-L/opt/ooce/lib/amd64 -lnsl -lsocket" tools && \
 	touch $@
 
 illumos: $(STAMPS)/illumos-stamp
