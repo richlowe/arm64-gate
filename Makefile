@@ -169,9 +169,9 @@ $(STAMPS)/libc-stamp: ssp_ns gcc
 	(cd illumos-gate && \
 	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libc; make install' && \
 	mkdir -p $(SYSROOT)/usr/lib && \
-	cp -a proto/root_aarch64/usr/lib/libc.* $(SYSROOT)/usr/lib/ && \
+	rsync -a proto/root_aarch64/usr/lib/libc.* $(SYSROOT)/usr/lib/ && \
 	mkdir -p $(SYSROOT)/lib && \
-	cp -a proto/root_aarch64/lib/libc.* $(SYSROOT)/lib/) && \
+	rsync -a proto/root_aarch64/lib/libc.* $(SYSROOT)/lib/) && \
 	touch $@
 
 libm: $(STAMPS)/libm-stamp
@@ -179,9 +179,9 @@ $(STAMPS)/libm-stamp: ssp_ns gcc
 	(cd illumos-gate && \
 	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libm_aarch64; make install' && \
 	mkdir -p $(SYSROOT)/usr/lib && \
-	cp -a proto/root_aarch64/usr/lib/libm.* $(SYSROOT)/usr/lib/ && \
+	rsync -a proto/root_aarch64/usr/lib/libm.* $(SYSROOT)/usr/lib/ && \
 	mkdir -p $(SYSROOT)/lib && \
-	cp -a proto/root_aarch64/lib/libm.* $(SYSROOT)/lib/) && \
+	rsync -a proto/root_aarch64/lib/libm.* $(SYSROOT)/lib/) && \
 	touch $@
 
 libsocket: $(STAMPS)/libsocket-stamp
@@ -189,9 +189,9 @@ $(STAMPS)/libsocket-stamp: libnsl ssp_ns gcc
 	(cd illumos-gate && \
 	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libsocket; make install' && \
 	mkdir -p $(SYSROOT)/usr/lib && \
-	cp -a proto/root_aarch64/usr/lib/libsocket.* $(SYSROOT)/usr/lib/ && \
+	rsync -a proto/root_aarch64/usr/lib/libsocket.* $(SYSROOT)/usr/lib/ && \
 	mkdir -p $(SYSROOT)/lib && \
-	cp -a proto/root_aarch64/lib/libsocket.* $(SYSROOT)/lib/) && \
+	rsync -a proto/root_aarch64/lib/libsocket.* $(SYSROOT)/lib/) && \
 	touch $@
 
 libkstat: $(STAMPS)/libkstat-stamp
@@ -199,9 +199,9 @@ $(STAMPS)/libkstat-stamp: libc ssp_ns gcc
 	(cd illumos-gate && \
 	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libkstat; make install' && \
 	mkdir -p $(SYSROOT)/usr/lib && \
-	cp -a proto/root_aarch64/usr/lib/libkstat.* $(SYSROOT)/usr/lib/ && \
+	rsync -a proto/root_aarch64/usr/lib/libkstat.* $(SYSROOT)/usr/lib/ && \
 	mkdir -p $(SYSROOT)/lib && \
-	cp -a proto/root_aarch64/lib/libkstat.* $(SYSROOT)/lib/) && \
+	rsync -a proto/root_aarch64/lib/libkstat.* $(SYSROOT)/lib/) && \
 	touch $@
 
 libnsl: $(STAMPS)/libnsl-stamp
@@ -209,9 +209,9 @@ $(STAMPS)/libnsl-stamp: libmp libmd libc ssp_ns gcc
 	(cd illumos-gate && \
 	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libnsl; make install' && \
 	mkdir -p $(SYSROOT)/usr/lib && \
-	cp -a proto/root_aarch64/usr/lib/libnsl.* $(SYSROOT)/usr/lib/ && \
+	rsync -a proto/root_aarch64/usr/lib/libnsl.* $(SYSROOT)/usr/lib/ && \
 	mkdir -p $(SYSROOT)/lib && \
-	cp -a proto/root_aarch64/lib/libnsl.* $(SYSROOT)/lib/) && \
+	rsync -a proto/root_aarch64/lib/libnsl.* $(SYSROOT)/lib/) && \
 	touch $@
 
 libmd: $(STAMPS)/libmd-stamp
@@ -219,9 +219,9 @@ $(STAMPS)/libmd-stamp: libc ssp_ns gcc
 	(cd illumos-gate && \
 	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libmd; make install' && \
 	mkdir -p $(SYSROOT)/usr/lib && \
-	cp -a proto/root_aarch64/usr/lib/libmd.* $(SYSROOT)/usr/lib/ && \
+	rsync -a proto/root_aarch64/usr/lib/libmd.* $(SYSROOT)/usr/lib/ && \
 	mkdir -p $(SYSROOT)/lib && \
-	cp -a proto/root_aarch64/lib/libmd.* $(SYSROOT)/lib/) && \
+	rsync -a proto/root_aarch64/lib/libmd.* $(SYSROOT)/lib/) && \
 	touch $@
 
 libmp: $(STAMPS)/libmp-stamp
@@ -229,9 +229,9 @@ $(STAMPS)/libmp-stamp: libc ssp_ns gcc
 	(cd illumos-gate && \
 	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libmp; make install' && \
 	mkdir -p $(SYSROOT)/usr/lib && \
-	cp -a proto/root_aarch64/usr/lib/libmp.* $(SYSROOT)/usr/lib/ && \
+	rsync -a proto/root_aarch64/usr/lib/libmp.* $(SYSROOT)/usr/lib/ && \
 	mkdir -p $(SYSROOT)/lib && \
-	cp -a proto/root_aarch64/lib/libmp.* $(SYSROOT)/lib/) && \
+	rsync -a proto/root_aarch64/lib/libmp.* $(SYSROOT)/lib/) && \
 	touch $@
 
 zlib: $(STAMPS)/zlib-stamp
@@ -284,7 +284,7 @@ $(STAMPS)/ssp_ns-stamp: gcc
 	(cd illumos-gate && \
 	$(BLDENV) ../env/aarch64 'cd usr/src/lib/ssp_ns && make install' && \
 	mkdir -p $(SYSROOT)/usr/lib && \
-	cp -a proto/root_aarch64/usr/lib/libssp* $(SYSROOT)/usr/lib/) && \
+	rsync -a proto/root_aarch64/usr/lib/libssp* $(SYSROOT)/usr/lib/) && \
 	touch $@
 
 libc-filters: $(STAMPS)/libc-filters-stamp
@@ -294,15 +294,15 @@ $(STAMPS)/libc-filters-stamp: libc gcc
 	$(BLDENV) ../env/aarch64 'cd usr/src/cmd/sgs/libdl && make install' && \
 	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libpthread && make install' && \
 	mkdir -p $(SYSROOT)/usr/lib && \
-	cp -a proto/root_aarch64/usr/lib/librt.* $(SYSROOT)/usr/lib/ && \
-	cp -a proto/root_aarch64/usr/lib/libdl.* $(SYSROOT)/usr/lib/ && \
-	cp -a proto/root_aarch64/usr/lib/libposix4.* $(SYSROOT)/usr/lib/ && \
-	cp -a proto/root_aarch64/usr/lib/libpthread.* $(SYSROOT)/usr/lib/ && \
+	rsync -a proto/root_aarch64/usr/lib/librt.* $(SYSROOT)/usr/lib/ && \
+	rsync -a proto/root_aarch64/usr/lib/libdl.* $(SYSROOT)/usr/lib/ && \
+	rsync -a proto/root_aarch64/usr/lib/libposix4.* $(SYSROOT)/usr/lib/ && \
+	rsync -a proto/root_aarch64/usr/lib/libpthread.* $(SYSROOT)/usr/lib/ && \
 	mkdir -p $(SYSROOT)/lib && \
-	cp -a proto/root_aarch64/lib/librt.* $(SYSROOT)/lib/ && \
-	cp -a proto/root_aarch64/lib/libdl.* $(SYSROOT)/lib/ && \
-	cp -a proto/root_aarch64/lib/libposix4.* $(SYSROOT)/lib/ && \
-	cp -a proto/root_aarch64/lib/libpthread.* $(SYSROOT)/lib/) && \
+	rsync -a proto/root_aarch64/lib/librt.* $(SYSROOT)/lib/ && \
+	rsync -a proto/root_aarch64/lib/libdl.* $(SYSROOT)/lib/ && \
+	rsync -a proto/root_aarch64/lib/libposix4.* $(SYSROOT)/lib/ && \
+	rsync -a proto/root_aarch64/lib/libpthread.* $(SYSROOT)/lib/) && \
 	touch $@
 
 libstdc++: $(STAMPS)/libstdc++-stamp
