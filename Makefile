@@ -169,11 +169,9 @@ $(STAMPS)/libc-stamp: ssp_ns gcc
 	(cd illumos-gate && \
 	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libc; make install' && \
 	mkdir -p $(SYSROOT)/usr/lib && \
-	rm -f $(SYSROOT)/usr/lib/libc.* \
-	cp -a proto/root_aarch64/usr/lib/libc* $(SYSROOT)/usr/lib/ && \
+	cp -a proto/root_aarch64/usr/lib/libc.* $(SYSROOT)/usr/lib/ && \
 	mkdir -p $(SYSROOT)/lib && \
-	rm -f $(SYSROOT)/lib/libc.* \
-	cp -a proto/root_aarch64/lib/libc* $(SYSROOT)/lib/) && \
+	cp -a proto/root_aarch64/lib/libc.* $(SYSROOT)/lib/) && \
 	touch $@
 
 libm: $(STAMPS)/libm-stamp
@@ -181,10 +179,8 @@ $(STAMPS)/libm-stamp: ssp_ns gcc
 	(cd illumos-gate && \
 	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libm_aarch64; make install' && \
 	mkdir -p $(SYSROOT)/usr/lib && \
-	rm -f $(SYSROOT)/usr/lib/libm.* \
 	cp -a proto/root_aarch64/usr/lib/libm.* $(SYSROOT)/usr/lib/ && \
 	mkdir -p $(SYSROOT)/lib && \
-	rm -f $(SYSROOT)/lib/libm.* \
 	cp -a proto/root_aarch64/lib/libm.* $(SYSROOT)/lib/) && \
 	touch $@
 
