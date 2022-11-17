@@ -451,8 +451,31 @@ $(CROSS):
 $(SETUP_TARGETS:%=$(BUILDS)/%):
 	mkdir -p $@
 
-clean:
-	rm -fr $(SYSROOT) $(BUILDS) $(STAMPS)
+clean-dtc:
+	cd dtc-1.6.1 && gmake clean
+
+clean-illumos:
+	(cd illumos-gate && \
+	 rm -fr packages && \
+	 rm -fr proto && \
+	 $(BLDENV) ../env/aarch64 'cd usr/src; make -j $(MAX_JOBS) clobber') && \
+
+# XXXARM: I am, once again, sorry about this.
+clean-nss:
+	(cd nss_build && \
+	    export NATIVE_MACH=i386 \
+	    MACH=aarch64 \
+	    SRC=$(PWD)/illumos-gate/usr/src/ \
+	    NSS_BASE=$(PWD)/nss \
+	    NSS_BUILD=$(PWD) \
+	    ONBLD_TOOLS=$(PWD)/illumos-gate/usr/src/tools/proto/root_i386-nd/opt/onbld \
+	    ROOT=$(SYSROOT) \
+	    aarch64_PRIMARY_CC=gcc10,$(CROSS)/bin/aarch64-solaris2.11-gcc,gnu \
+	    aarch64_SYSROOT=$(SYSROOT); \
+	    make -j $(MAX_JOBS) -e clobber)
+
+clean: clean-dtc clean-illumos clean-nss
+	rm -fr $(SYSROOT) $(BUILDS) $(STAMPS) $(CROSS)
 
 clobber: clean
 	rm -fr $(ARCHIVES)
