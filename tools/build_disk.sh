@@ -72,7 +72,7 @@ sudo pkg -R $ROOT install				\
      install/beadm@latest
 
 # Set up a skeleton /dev
-sudo tar -C $ROOT -xf tools/dev.tar
+sudo tar -xf tools/dev.tar -C $ROOT
 sudo touch $ROOT/reconfigure
 
 # Drop in extras, we're sloppy about libraries being in /usr/lib or /lib
