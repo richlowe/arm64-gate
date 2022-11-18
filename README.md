@@ -69,6 +69,14 @@ sudo qemu-system-aarch64 -nographic -machine virt-4.1 -m 2g -smp 1 -cpu cortex-a
 A convenient way to do this is just to take the entire `qemu-setup/`
 directory.
 
+> **Note:** the networking configuration here is important, you need to have _a_
+> networking device for the device tree to be what we expect right now.  The
+> configuration above and in `run.sh` is for qemu on linux using bridge
+> networking, and assumes that `libvirtd` is running and that `qemu` is allowed
+> to use the `virbr0` bridge it creates.  If this is inappropriate for you, you
+> need to provide _an_ alternative, in the worst case user networking `-netdev
+> user,id=net0`.
+
 You will see messages from the temporary booter that seem worrying, about
 missing boot_archives and `vdev_probe`, these are, weirdly, specific to the
 currently weird booting method.
