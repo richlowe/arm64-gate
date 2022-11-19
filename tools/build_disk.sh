@@ -69,7 +69,10 @@ sudo pkg -R $ROOT install				\
      system/library/iconv/extra@latest			\
      system/library/iconv/utf-8@latest			\
      system/library/iconv/xsh4/latin@latest		\
-     install/beadm@latest
+     install/beadm@latest				\
+     driver/storage/vioblk@latest			\
+     driver/misc/virtio@latest				\
+     driver/network/vioif@latest
 
 # Set up a skeleton /dev
 sudo tar -xf tools/dev.tar -C $ROOT
