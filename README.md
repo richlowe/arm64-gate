@@ -11,6 +11,8 @@ easy, if not pleasant, at the current time.
 
 - An illumos system
 - A compilation environment, headers, compiler, etc.
+  (You will need both GCC 7, GCC 10, and their dependencies and build
+  dependencies to include at least GMP, MPC, and MPFR).
 - `sudo` (pkg:/security/sudo)
 - `mkisofs` (pkg:/media/cdrtools)
 - `rsync` (pkg:/network/rsync)
