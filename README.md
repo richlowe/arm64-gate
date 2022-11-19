@@ -19,6 +19,9 @@ easy, if not pleasant, at the current time.
 - `swig` (pkg:/developer/swig)
 - GnuTLS (pkg:/library/gnutls-3, pkg:/ooce/library/gnutls on omnios)
 - GNU `install` (pkg:/file/gnu-coreutils)
+- GCC-7 (pkg:/developer/gcc-7)
+- GCC-10 (pkg:/developer/gcc-10)
+- Build essentials (pkg:/metapackages/build-essential)
 - Hopefully nothing else I forgot
 
 ## Building
@@ -62,8 +65,8 @@ sudo qemu-system-aarch64 -nographic -machine virt-4.1 -m 2g -smp 1 -cpu cortex-a
 - `-netdev bridge,id=net0,br=virbr0` -- bridged networking, linuxily
 - `-device virtio-net-device,netdev=net0,mac=52:54:00:70:0a:e4` -- virtual
   NIC, `platmac0` in the system
-`-device virtio-blk-device,drive=hd0` -- our disk
-`-drive file=illumos-disk.img,format=raw,id=hd0,if=none` -- the illumos disk
+- `-device virtio-blk-device,drive=hd0` -- our disk
+- `-drive file=illumos-disk.img,format=raw,id=hd0,if=none` -- the illumos disk
   image you want to boot.
 
 A convenient way to do this is just to take the entire `qemu-setup/`
