@@ -22,6 +22,7 @@ easy, if not pleasant, at the current time.
 - GCC-7 (pkg:/developer/gcc-7)
 - GCC-10 (pkg:/developer/gcc-10)
 - Build essentials (pkg:/metapackages/build-essential)
+- MPC library (pkg:/library/mpc)
 - Hopefully nothing else I forgot
 
 ## Building
