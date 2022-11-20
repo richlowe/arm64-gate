@@ -458,7 +458,7 @@ clean-illumos:
 	(cd illumos-gate && \
 	 rm -fr packages && \
 	 rm -fr proto && \
-	 $(BLDENV) ../env/aarch64 'cd usr/src; make -j $(MAX_JOBS) clobber') && \
+	 $(BLDENV) ../env/aarch64 'cd usr/src; make -j $(MAX_JOBS) clobber')
 
 # XXXARM: I am, once again, sorry about this.
 clean-nss:
