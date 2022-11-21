@@ -8,7 +8,7 @@ MNT=/mnt
 ROOTFS=ROOT/braich
 ROOT=$MNT/$ROOTFS
 
-if [[ ! -f Makefile && ! -f illumos-gate ]]; then
+if [[ ! -f Makefile || ! -d illumos-gate ]]; then
 	print -u2 "$0 should be run from the root of arm64-gate"
 	exit 2
 fi
