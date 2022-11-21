@@ -37,12 +37,12 @@ SETUP_TARGETS =		\
 	libm		\
 	libmd		\
 	libnsl		\
-	libressl	\
 	libsocket	\
 	libstdc++	\
 	libxml2		\
 	nspr		\
 	nss		\
+	openssl		\
 	sgs		\
 	ssp_ns		\
 	u-boot		\
@@ -55,10 +55,10 @@ DOWNLOADS=		\
 	gcc		\
 	idnkit		\
 	illumos-gate	\
-	libressl	\
 	libxml2		\
 	nspr		\
 	nss		\
+	openssl		\
 	u-boot		\
 	xorriso		\
 	zlib
@@ -75,9 +75,11 @@ download-idnkit: $(ARCHIVES)
 	wget -O archives/idnkit-2.3.tar.bz2 http://jprs.co.jp/idn/idnkit-2.3.tar.bz2
 	tar xf archives/idnkit-2.3.tar.bz2
 
-download-libressl: $(ARCHIVES)
-	wget -O archives/libressl-3.6.1.tar.gz https://ftp.usa.openbsd.org/pub/OpenBSD/LibreSSL/libressl-3.6.1.tar.gz
-	tar xf archives/libressl-3.6.1.tar.gz
+download-openssl: $(ARCHIVES)
+	wget -O archives/openssl-3.0.7.tar.gz https://www.openssl.org/source/openssl-3.0.7.tar.gz
+	gtar xf archives/openssl-3.0.7.tar.gz
+	cp files/openssl-15-illumos-aarch.conf \
+	    openssl-3.0.7/Configurations/15-illumos-aarch.conf
 
 download-gcc: $(ARCHIVES)
 	git clone --shallow-since=2019-01-01 -b il-10_3_0-arm64 https://github.com/richlowe/gcc
@@ -126,7 +128,7 @@ $(STAMPS)/binutils-gdb-stamp:
 
 # Build a tools ld and headers and copy them into the sysroot (in the normal place)
 sgs: $(STAMPS)/sgs-stamp
-$(STAMPS)/sgs-stamp: 
+$(STAMPS)/sgs-stamp:
 	(cd illumos-gate && \
 	 $(BLDENV) ../env/aarch64 'cd usr/src/; make -j $(MAX_JOBS) bldtools sgs' && \
 	 rsync -a usr/src/tools/proto/root_i386-nd/ $(CROSS)/ && \
@@ -368,16 +370,21 @@ $(STAMPS)/nss-stamp: libc libc-filters libkstat ssp_ns gcc
 	    make -j $(MAX_JOBS) -e install) && \
 	touch $@
 
-libressl: $(STAMPS)/libressl-stamp
-$(STAMPS)/libressl-stamp: libc libc-filters libsocket libnsl ssp_ns gcc
-	(cd build/libressl && \
+openssl: $(STAMPS)/openssl-stamp
+$(STAMPS)/openssl-stamp: libc libc-filters libsocket libnsl zlib ssp_ns gcc
+	(cd build/openssl && \
 	 env PATH="$(CROSS)/bin/:$$PATH" \
-         CC="$(CROSS)/bin/aarch64-solaris2.11-gcc --sysroot=$(SYSROOT)" \
+	 CC="gcc --sysroot=$(SYSROOT)" \
+	 CFLAGS="-I$(SYSROOT)/usr/include" \
+	 LDFLAGS="-shared -Wl,-z,text,-z,aslr,-z,ignore" \
 	 MAKE=gmake \
-	 ../../libressl-3.6.1/configure \
-	    --build=i386-pc-solaris2.11 \
-	    --host=aarch64-solaris2.11 \
-	    --prefix=$(SYSROOT)/usr && \
+	 ../../openssl-3.0.7/Configure \
+	    --prefix=$(SYSROOT)/usr \
+	    --cross-compile-prefix=aarch64-solaris2.11- \
+	    --api=1.1.1 \
+	    shared threads zlib enable-ec_nistp_64_gcc_128 no-asm \
+	    solaris-aarch64-gcc \
+	    && \
 	env PATH="$(CROSS)/bin/:$$PATH" gmake -j $(MAX_JOBS) && \
 	env PATH="$(CROSS)/bin/:$$PATH" gmake -j $(MAX_JOBS) install) && \
 	touch $@
