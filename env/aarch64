@@ -164,6 +164,12 @@ PKGVERS_BRANCH=$(date +%Y.%-m.%-e.%-H.%-M);	export PKGVERS_BRANCH
 #export PYTHON3_VERSION=3.5
 #export PYTHON3_PKGVERS=-35
 #export PYTHON3_SUFFIX=m
+for v in 3.9 3.10 3.11; do
+	[ -x /usr/bin/python$v ] || continue
+	export PYTHON3_VERSION=$v
+	export PYTHON3_PKGVERS=-${v//./}
+	break
+done
 
 # Set console color scheme either by build type:
 #
