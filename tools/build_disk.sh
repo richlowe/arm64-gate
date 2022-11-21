@@ -99,8 +99,8 @@ sudo cp sysroot/usr/bin/xorrisofs $ROOT/usr/bin
 sudo cp sysroot/usr/bin/xorrisofs $ROOT/usr/bin/mkisofs
 
 # Without mdb(8) or kmdb(8) kmem debugging is much less useful, and much too
-# slow in the emulator.
-echo "set kmem_flags = 0x0" | sudo tee -a $ROOT/etc/system > /dev/null
+# slow in the emulator.  This is KMF_DEADBEEF|KMF_REDZONE
+echo "set kmem_flags = 0x6" | sudo tee -a $ROOT/etc/system > /dev/null
 
 # Don't require passwords
 sudo sed -i'' -e 's/PASSREQ=YES/PASSREQ=NO/' $ROOT/etc/default/login
