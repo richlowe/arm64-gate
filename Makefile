@@ -77,7 +77,7 @@ download-idnkit: $(ARCHIVES)
 
 download-openssl: $(ARCHIVES)
 	wget -O archives/openssl-3.0.7.tar.gz https://www.openssl.org/source/openssl-3.0.7.tar.gz
-	gtar xf archives/openssl-3.0.7.tar.gz
+	tar xf archives/openssl-3.0.7.tar.gz openssl-3.0.7
 	cp files/openssl-15-illumos-aarch.conf \
 	    openssl-3.0.7/Configurations/15-illumos-aarch.conf
 
