@@ -75,9 +75,11 @@ download-idnkit: $(ARCHIVES)
 	wget -O archives/idnkit-2.3.tar.bz2 http://jprs.co.jp/idn/idnkit-2.3.tar.bz2
 	tar xf archives/idnkit-2.3.tar.bz2
 
+# XXXARM: We specify what we extract, because the release tarball contains a
+# GNU tar-ism we don't understand.
 download-openssl: $(ARCHIVES)
 	wget -O archives/openssl-3.0.7.tar.gz https://www.openssl.org/source/openssl-3.0.7.tar.gz
-	gtar xf archives/openssl-3.0.7.tar.gz
+	tar xf archives/openssl-3.0.7.tar.gz openssl-3.0.7
 	cp files/openssl-15-illumos-aarch.conf \
 	    openssl-3.0.7/Configurations/15-illumos-aarch.conf
 
