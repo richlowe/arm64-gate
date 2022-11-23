@@ -14,7 +14,7 @@ STAMPS=$(PWD)/stamps
 ARCHIVES=$(PWD)/archives
 
 # Max jobs for sub-builds
-MAX_JOBS= 12
+MAX_JOBS=$(shell psrinfo -t -c)
 
 BLDENV= $(PWD)/illumos-gate/usr/src/tools/scripts/bldenv
 
