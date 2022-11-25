@@ -114,6 +114,12 @@ echo "braich" | sudo tee -a $ROOT/etc/nodename > /dev/null
 echo "/dev/zvol/dsk/$POOL/swap	-	-	swap	-	no	-" | \
 	sudo tee -a $ROOT/etc/vfstab >/dev/null
 
+# Put the SMF profiles in place
+sudo ln -s ns_files.xml $ROOT/etc/svc/profile/name_service.xml
+sudo ln -s generic_limited_net.xml $ROOT/etc/svc/profile/generic.xml
+sudo ln -s inetd_generic.xml $ROOT/etc/svc/profile/inetd_services.xml
+sudo ln -s platform_none.xml $ROOT/etc/svc/profile/platform.xml
+
 # Create a boot_archive manually, because tooling
 (cd $ROOT;
  sudo mkisofs -quiet -graft-points -dlrDJN -relaxed-filenames -o ./platform/armv8/boot_archive \
