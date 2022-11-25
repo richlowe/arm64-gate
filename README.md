@@ -50,13 +50,13 @@ I use something like this (on another system at present, as modern qemu has
 issues under illumos):
 
 ```
-sudo qemu-system-aarch64 -nographic -machine virt-4.1 -m 2g -smp 1 -cpu cortex-a53 -kernel inetboot.bin -append "-D /virtio_mmio@a003c00" -netdev bridge,id=net0,br=virbr0 -device virtio-net-device,netdev=net0,mac=52:54:00:70:0a:e4 -device virtio-blk-device,drive=hd0 -drive file=$PWD/illumos-disk.img,format=raw,id=hd0,if=none
+sudo qemu-system-aarch64 -nographic -machine virt-4.1 -m 2g -smp 2 -cpu cortex-a53 -kernel inetboot.bin -append "-D /virtio_mmio@a003c00" -netdev bridge,id=net0,br=virbr0 -device virtio-net-device,netdev=net0,mac=52:54:00:70:0a:e4 -device virtio-blk-device,drive=hd0 -drive file=$PWD/illumos-disk.img,format=raw,id=hd0,if=none
 ```
 
 - `-nographic` -- serial console on stdout
 - `-machine virt-4.1` -- the current target qemu machine
 - `-m 2g` -- 2G of memory, more can never hurt
-- `-smp 1` -- 1 CPU, again, more shouldn't hurt
+- `-smp 2` -- 2 CPUs, again, more shouldn't hurt
 - `-cpu cortex-a53` -- an appropriate CPU for the port
 - `-kernel inetboot.bin` -- the inetboot.bin for qemu taken from the illumos
   build
@@ -69,7 +69,9 @@ sudo qemu-system-aarch64 -nographic -machine virt-4.1 -m 2g -smp 1 -cpu cortex-a
   image you want to boot.
 
 A convenient way to do this is just to take the entire `qemu-setup/`
-directory.
+directory.  Note that the default configuration we use is trying to strike a
+balance between running on smaller systems and booting in an even vaguely
+tolerable amount of time.  It is a balance we have not yet reached.
 
 > **Note:** the networking configuration here is important, you need to have _a_
 > networking device for the device tree to be what we expect right now.  The

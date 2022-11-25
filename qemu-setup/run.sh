@@ -4,7 +4,7 @@ exec sudo qemu-system-aarch64 \
      -nographic \
      -machine virt-4.1 \
      -m 2g \
-     -smp 1 \
+     -smp 2 \
      -cpu cortex-a53 \
      -kernel inetboot.bin \
      -append "-D /virtio_mmio@a003c00" \
