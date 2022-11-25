@@ -36,9 +36,6 @@ sudo fmthard -d 0:2:01:$start:$size $RAW_DEVICE
 sudo zpool create -f -t $POOL -dm $MNT $POOL $SLICE
 sudo zfs create -o canmount=noauto $POOL/ROOT
 sudo zfs create $POOL/$ROOTFS
-sudo pkg image-create -F --variant variant.arch=aarch64 $MNT/$ROOTFS
-
-sudo pkg -R $ROOT set-publisher -p $PWD/illumos-gate/packages/aarch64/nightly/repo.redist
 sudo zfs create -V 1G $POOL/swap
 
 # for reasons I can't fathom, synthetic packages don't get published right now
@@ -47,34 +44,19 @@ pkgsend publish -s illumos-gate/packages/aarch64/nightly/repo.redist \
 pkgsend publish -s illumos-gate/packages/aarch64/nightly/repo.redist \
     illumos-gate/usr/src/pkg/packages.aarch64/osnet-redist.mog
 
-# We don't have (most) dependencies because we don't have a full pkgdepend
-# (or full packages), so we have to spell stuff out.
-sudo pkg -R $ROOT install				\
+sudo pkg image-create -F \
+     --variant variant.arch=aarch64 \
+     -p $PWD/illumos-gate/packages/aarch64/nightly/repo.redist $MNT/$ROOTFS
+
+sudo pkg -R $ROOT set-property flush-content-cache-on-success True
+
+# Install everything, to the degree that it is possible, for convenience since
+# there's no pkg(8) in the image
+sudo pkg -R $ROOT install --no-refresh			\
      osnet-incorporation@latest				\
      SUNWcsd@latest					\
      SUNWcs@latest					\
-     system/kernel@latest				\
-     system/kernel/platform@latest			\
-     system/kernel/platform/meson-gxbb@latest		\
-     system/kernel/platform/raspberry-pi-4@latest	\
-     system/kernel/platform/qemu-virtual@latest		\
-     system/file-system/zfs@latest			\
-     driver/storage/blkdev@latest			\
-     system/library@latest				\
-     system/boot/real-mode@latest			\
-     system/library/math@latest				\
-     system/extended-system-utilities@latest		\
-     service/fault-management@latest			\
-     system/ficl@latest					\
-     system/network@latest				\
-     system/library/iconv/unicode@latest		\
-     system/library/iconv/extra@latest			\
-     system/library/iconv/utf-8@latest			\
-     system/library/iconv/xsh4/latin@latest		\
-     install/beadm@latest				\
-     driver/storage/vioblk@latest			\
-     driver/misc/virtio@latest				\
-     driver/network/vioif@latest
+     osnet-redistributable@latest
 
 # Set up a skeleton /dev
 sudo tar -xf tools/dev.tar -C $ROOT

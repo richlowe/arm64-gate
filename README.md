@@ -90,13 +90,18 @@ and because the emulation is slow and it helps to keep track that something is
 still happening, these are hardwired in the source at present, absent a real
 booter.
 
-There are also lingering bugs around SMF that may or may not fail your boot.
-A notable one is that svc:/system/rbac always times out, and often takes a
-long time to do so, be patient.
+There are also lingering bugs around SMF that may or may not fail during boot.
+The two most notable are that, after messages indicating your CPU(s) are
+online, things will pause without output while `svvcfg apply` happens.  The
+other is that `svc:/system/rbac`, `svc:/network/inetd-upgrade`, and
+`svc:/system/update-man-index` almost always times out, and often takes a long
+time to do so, be patient.  The first of these has dependencies, and so stall
+a lot of our boot process.
 
-Note also that we will rebuild the `boot_archive` and then reboot again, on
+Note also that we will rebuild the `boot_archive` and then reboot again on
 first boot.  This is because the `boot_archive` created in
-`tools/build_disk.sh` is an insufficiently good fake.
+`tools/build_disk.sh` is an insufficiently good fake, and `/reconfigure`
+exists so `devfsadm(8)` gets us a real `/dev`
 
 ## After you boot
 
