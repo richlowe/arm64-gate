@@ -120,6 +120,22 @@ sudo ln -s generic_limited_net.xml $ROOT/etc/svc/profile/generic.xml
 sudo ln -s inetd_generic.xml $ROOT/etc/svc/profile/inetd_services.xml
 sudo ln -s platform_none.xml $ROOT/etc/svc/profile/platform.xml
 
+# Import all the services ahead of time.  This is a shame, because allowing
+# EMI to happen has found many bugs, but it also takes _forever_
+SVCCFG_REPOSITORY=/tmp/arm-gate.$$
+
+cp $ROOT/lib/svc/seed/global.db $SVCCFG_REPOSITORY
+chmod u+w $SVCCFG_REPOSITORY
+env PKG_INSTALL_ROOT=$ROOT \
+    SVCCFG_DTD=$ROOT/usr/share/lib/xml/dtd/service_bundle.dtd.1 \
+    SVCCFG_REPOSITORY=$SVCCFG_REPOSITORY \
+    SVCCFG_CHECKHASH=1 illumos-gate/usr/src/cmd/svc/svccfg/svccfg-native import \
+		       -p /dev/stdout $ROOT/lib/svc/manifest
+sudo cp -a $SVCCFG_REPOSITORY $ROOT/etc/svc/repository.db
+sudo chown root:sys $ROOT/etc/svc/repository.db
+sudo chmod 0600 $ROOT/etc/svc/repository.db
+rm -f $SVCCFG_REPOSITORY
+
 # Create a boot_archive manually, because tooling
 (cd $ROOT;
  sudo mkisofs -quiet -graft-points -dlrDJN -relaxed-filenames -o ./platform/armv8/boot_archive \
