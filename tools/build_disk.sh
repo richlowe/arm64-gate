@@ -7,6 +7,7 @@ POOL=armpool
 MNT=/mnt
 ROOTFS=ROOT/braich
 ROOT=$MNT/$ROOTFS
+DISKSIZE=4g
 
 if [[ ! -f Makefile || ! -d illumos-gate ]]; then
 	print -u2 "$0 should be run from the root of arm64-gate"
@@ -15,7 +16,7 @@ fi
 
 mkdir -p $PWD/qemu-setup
 
-mkfile 2g $DISK
+mkfile $DISKSIZE $DISK
 
 BASE_DEVICE=$(sudo lofiadm -la $DISK)
 RAW_DEVICE=${BASE_DEVICE/dsk/rdsk}
@@ -38,6 +39,7 @@ sudo zfs create $POOL/$ROOTFS
 sudo pkg image-create -F --variant variant.arch=aarch64 $MNT/$ROOTFS
 
 sudo pkg -R $ROOT set-publisher -p $PWD/illumos-gate/packages/aarch64/nightly/repo.redist
+sudo zfs create -V 1G $POOL/swap
 
 # for reasons I can't fathom, synthetic packages don't get published right now
 pkgsend publish -s illumos-gate/packages/aarch64/nightly/repo.redist \
@@ -107,6 +109,10 @@ sudo sed -i'' -e 's/PASSREQ=YES/PASSREQ=NO/' $ROOT/etc/default/login
 
 # Have a host name etc, in case dhcp
 echo "braich" | sudo tee -a $ROOT/etc/nodename > /dev/null
+
+# Have some swap space
+echo "/dev/zvol/dsk/$POOL/swap	-	-	swap	-	no	-" | \
+	sudo tee -a $ROOT/etc/vfstab >/dev/null
 
 # Create a boot_archive manually, because tooling
 (cd $ROOT;
