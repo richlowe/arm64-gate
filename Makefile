@@ -13,9 +13,6 @@ STAMPS=$(PWD)/stamps
 # Where source archives end up
 ARCHIVES=$(PWD)/archives
 
-# Max jobs for sub-builds
-MAX_JOBS=$(shell psrinfo -t -c)
-
 BLDENV= $(PWD)/illumos-gate/usr/src/tools/scripts/bldenv
 
 # OmniOS puts GMP headers in a weird place, know where to find them.
@@ -24,6 +21,10 @@ GMPINCDIR= /usr/include/gmp
 # XXXARM: We can't .KEEP_STATE because something confuses everything
 # (directory changes in rules?) and it gets bogus dependencies and always
 # rebuilds everything (which, to be fair, often happens anyway).
+
+.KEEP_STATE:
+
+.NOTPARALLEL:
 
 SETUP_TARGETS =		\
 	binutils-gdb 	\
@@ -124,15 +125,15 @@ $(STAMPS)/binutils-gdb-stamp:
 	    --target=aarch64-unknown-solaris2.11 \
 	    --prefix=$(CROSS) \
 	    --enable-initfini-array && \
-	gmake -j $(MAX_JOBS) CPPFLAGS+='-I$(GMPINCDIR)' && \
-	gmake -j $(MAX_JOBS) install) && \
+	gmake CPPFLAGS+='-I$(GMPINCDIR)' && \
+	gmake install) && \
 	touch $@
 
 # Build a tools ld and headers and copy them into the sysroot (in the normal place)
 sgs: $(STAMPS)/sgs-stamp
 $(STAMPS)/sgs-stamp:
 	(cd illumos-gate && \
-	 $(BLDENV) ../env/aarch64 'cd usr/src/; make -j $(MAX_JOBS) bldtools sgs' && \
+	 $(BLDENV) ../env/aarch64 'cd usr/src/; make bldtools sgs' && \
 	 rsync -a usr/src/tools/proto/root_i386-nd/ $(CROSS)/ && \
 	 mkdir -p $(SYSROOT)/usr/include && \
 	 rsync -a proto/root_aarch64/usr/include/ $(SYSROOT)/usr/include/) && \
@@ -168,15 +169,15 @@ $(STAMPS)/gcc-stamp: sgs binutils-gdb
 	    --with-as=$(CROSS)/bin/aarch64-unknown-solaris2.11-as \
 	    --without-gnu-ld \
 	    --with-ld=$(CROSS)/opt/onbld/bin/amd64/ld && \
-	gmake -j $(MAX_JOBS) && \
-	gmake -j $(MAX_JOBS) install && \
+	gmake && \
+	gmake install && \
 	rm -fr $(CROSS)/lib/gcc/aarch64-unknown-solaris2.11/10.3.0/include-fixed) && \
 	touch $@
 
 crt: $(STAMPS)/crt-stamp
 $(STAMPS)/crt-stamp: sgs gcc
 	(cd illumos-gate && \
-	$(BLDENV) ../env/aarch64 'cd usr/src/lib/crt; make -j $(MAX_JOBS) install' && \
+	$(BLDENV) ../env/aarch64 'cd usr/src/lib/crt; make install' && \
 	mkdir -p $(SYSROOT)/usr/lib/aarch64 && \
 	cp proto/root_aarch64/usr/lib/*.o $(SYSROOT)/usr/lib/) && \
 	touch $@
@@ -184,7 +185,7 @@ $(STAMPS)/crt-stamp: sgs gcc
 libc: $(STAMPS)/libc-stamp
 $(STAMPS)/libc-stamp: ssp_ns gcc
 	(cd illumos-gate && \
-	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libc; make -j $(MAX_JOBS) install' && \
+	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libc; make install' && \
 	mkdir -p $(SYSROOT)/usr/lib && \
 	rsync -a proto/root_aarch64/usr/lib/libc.* $(SYSROOT)/usr/lib/ && \
 	mkdir -p $(SYSROOT)/lib && \
@@ -194,7 +195,7 @@ $(STAMPS)/libc-stamp: ssp_ns gcc
 libm: $(STAMPS)/libm-stamp
 $(STAMPS)/libm-stamp: ssp_ns gcc
 	(cd illumos-gate && \
-	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libm_aarch64; make -j $(MAX_JOBS) install' && \
+	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libm_aarch64; make install' && \
 	mkdir -p $(SYSROOT)/usr/lib && \
 	rsync -a proto/root_aarch64/usr/lib/libm.* $(SYSROOT)/usr/lib/ && \
 	mkdir -p $(SYSROOT)/lib && \
@@ -204,7 +205,7 @@ $(STAMPS)/libm-stamp: ssp_ns gcc
 libsocket: $(STAMPS)/libsocket-stamp
 $(STAMPS)/libsocket-stamp: libnsl ssp_ns gcc
 	(cd illumos-gate && \
-	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libsocket; make -j $(MAX_JOBS) install' && \
+	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libsocket; make install' && \
 	mkdir -p $(SYSROOT)/usr/lib && \
 	rsync -a proto/root_aarch64/usr/lib/libsocket.* $(SYSROOT)/usr/lib/ && \
 	mkdir -p $(SYSROOT)/lib && \
@@ -214,7 +215,7 @@ $(STAMPS)/libsocket-stamp: libnsl ssp_ns gcc
 libkstat: $(STAMPS)/libkstat-stamp
 $(STAMPS)/libkstat-stamp: libc ssp_ns gcc
 	(cd illumos-gate && \
-	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libkstat; make -j $(MAX_JOBS) install' && \
+	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libkstat; make install' && \
 	mkdir -p $(SYSROOT)/usr/lib && \
 	rsync -a proto/root_aarch64/usr/lib/libkstat.* $(SYSROOT)/usr/lib/ && \
 	mkdir -p $(SYSROOT)/lib && \
@@ -224,7 +225,7 @@ $(STAMPS)/libkstat-stamp: libc ssp_ns gcc
 libnsl: $(STAMPS)/libnsl-stamp
 $(STAMPS)/libnsl-stamp: libmp libmd libc ssp_ns gcc
 	(cd illumos-gate && \
-	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libnsl; make -j $(MAX_JOBS) install' && \
+	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libnsl; make install' && \
 	mkdir -p $(SYSROOT)/usr/lib && \
 	rsync -a proto/root_aarch64/usr/lib/libnsl.* $(SYSROOT)/usr/lib/ && \
 	mkdir -p $(SYSROOT)/lib && \
@@ -234,7 +235,7 @@ $(STAMPS)/libnsl-stamp: libmp libmd libc ssp_ns gcc
 libmd: $(STAMPS)/libmd-stamp
 $(STAMPS)/libmd-stamp: libc ssp_ns gcc
 	(cd illumos-gate && \
-	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libmd; make -j $(MAX_JOBS) install' && \
+	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libmd; make install' && \
 	mkdir -p $(SYSROOT)/usr/lib && \
 	rsync -a proto/root_aarch64/usr/lib/libmd.* $(SYSROOT)/usr/lib/ && \
 	mkdir -p $(SYSROOT)/lib && \
@@ -244,7 +245,7 @@ $(STAMPS)/libmd-stamp: libc ssp_ns gcc
 libmp: $(STAMPS)/libmp-stamp
 $(STAMPS)/libmp-stamp: libc ssp_ns gcc
 	(cd illumos-gate && \
-	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libmp; make -j $(MAX_JOBS) install' && \
+	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libmp; make install' && \
 	mkdir -p $(SYSROOT)/usr/lib && \
 	rsync -a proto/root_aarch64/usr/lib/libmp.* $(SYSROOT)/usr/lib/ && \
 	mkdir -p $(SYSROOT)/lib && \
@@ -261,8 +262,8 @@ $(STAMPS)/zlib-stamp: libc ssp_ns gcc
 	      LDSHARED="$(CROSS)/bin/aarch64-unknown-solaris2.11-gcc -shared" \
 	      CFLAGS="--sysroot=$(SYSROOT) -fpic" \
 	  ../../zlib-1.2.12/configure --shared --prefix=$(SYSROOT)/usr && \
-	  env PATH="$(CROSS)/bin:$$PATH" gmake -j $(MAX_JOBS) && \
-	  env PATH="$(CROSS)/bin:$$PATH" gmake -j $(MAX_JOBS) install) && \
+	  env PATH="$(CROSS)/bin:$$PATH" gmake && \
+	  env PATH="$(CROSS)/bin:$$PATH" gmake install) && \
 	touch $@
 
 libxml2: $(STAMPS)/libxml2-stamp
@@ -278,8 +279,8 @@ $(STAMPS)/libxml2-stamp: libc libm libmp libmd zlib ssp_ns gcc
 	    --without-zlib \
 	    --without-lzma \
 	    --without-python && \
-	 env PATH="$(CROSS)/bin:$$PATH" gmake -j $(MAX_JOBS) LDFLAGS+="-lsocket -lnsl -lmd" && \
-	 env PATH="$(CROSS)/bin:$$PATH" gmake -j $(MAX_JOBS) install) && \
+	 env PATH="$(CROSS)/bin:$$PATH" gmake LDFLAGS+="-lsocket -lnsl -lmd" && \
+	 env PATH="$(CROSS)/bin:$$PATH" gmake install) && \
 	touch $@
 
 idnkit: $(STAMPS)/idnkit-stamp
@@ -292,14 +293,14 @@ $(STAMPS)/idnkit-stamp: libc ssp_ns gcc
 	    --host=aarch64-unknown-solaris2.11 \
 	    --with-sysroot=$(SYSROOT) \
 	    --prefix=$(SYSROOT)/usr && \
-	 env PATH="$(CROSS)/bin:$$PATH" gmake -j $(MAX_JOBS) && \
-	 env PATH="$(CROSS)/bin:$$PATH" gmake -j $(MAX_JOBS) install) && \
+	 env PATH="$(CROSS)/bin:$$PATH" gmake && \
+	 env PATH="$(CROSS)/bin:$$PATH" gmake install) && \
 	touch $@
 
 ssp_ns: $(STAMPS)/ssp_ns-stamp
 $(STAMPS)/ssp_ns-stamp: gcc
 	(cd illumos-gate && \
-	$(BLDENV) ../env/aarch64 'cd usr/src/lib/ssp_ns && make -j $(MAX_JOBS) install' && \
+	$(BLDENV) ../env/aarch64 'cd usr/src/lib/ssp_ns && make install' && \
 	mkdir -p $(SYSROOT)/usr/lib && \
 	rsync -a proto/root_aarch64/usr/lib/libssp* $(SYSROOT)/usr/lib/) && \
 	touch $@
@@ -307,9 +308,9 @@ $(STAMPS)/ssp_ns-stamp: gcc
 libc-filters: $(STAMPS)/libc-filters-stamp
 $(STAMPS)/libc-filters-stamp: libc gcc
 	(cd illumos-gate && \
-	$(BLDENV) ../env/aarch64 'cd usr/src/lib/librt && make -j $(MAX_JOBS) install' && \
-	$(BLDENV) ../env/aarch64 'cd usr/src/cmd/sgs/libdl && make -j $(MAX_JOBS) install' && \
-	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libpthread && make -j $(MAX_JOBS) install' && \
+	$(BLDENV) ../env/aarch64 'cd usr/src/lib/librt && make install' && \
+	$(BLDENV) ../env/aarch64 'cd usr/src/cmd/sgs/libdl && make install' && \
+	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libpthread && make install' && \
 	mkdir -p $(SYSROOT)/usr/lib && \
 	rsync -a proto/root_aarch64/usr/lib/librt.* $(SYSROOT)/usr/lib/ && \
 	rsync -a proto/root_aarch64/usr/lib/libdl.* $(SYSROOT)/usr/lib/ && \
@@ -335,8 +336,8 @@ $(STAMPS)/libstdc++-stamp: libc libc-filters ssp_ns gcc
 	../../gcc/libstdc++-v3/configure \
 	    --host=aarch64-unknown-solaris2.11 \
 	    --prefix=$(SYSROOT)/usr && \
-	env PATH="$(CROSS)/bin:$$PATH" gmake -j $(MAX_JOBS) && \
-	env PATH="$(CROSS)/bin:$$PATH" gmake -j $(MAX_JOBS) install) && \
+	env PATH="$(CROSS)/bin:$$PATH" gmake && \
+	env PATH="$(CROSS)/bin:$$PATH" gmake install) && \
 	touch $@
 
 nspr: $(STAMPS)/nspr-stamp
@@ -351,8 +352,8 @@ $(STAMPS)/nspr-stamp: libc libc-filters ssp_ns gcc
 	    --libdir=$(SYSROOT)/usr/lib/mps \
 	    --bindir=$(SYSROOT)/usr/bin \
 	    --includedir=$(SYSROOT)/usr/include/mps && \
-	env PATH="$(CROSS)/bin/:$$PATH" gmake -j $(MAX_JOBS) && \
-	env PATH="$(CROSS)/bin/:$$PATH" gmake -j $(MAX_JOBS) install) && \
+	env PATH="$(CROSS)/bin/:$$PATH" gmake && \
+	env PATH="$(CROSS)/bin/:$$PATH" gmake install) && \
 	touch $@
 
 # XXXARM: This is horrid, I'm sorry
@@ -368,8 +369,8 @@ $(STAMPS)/nss-stamp: libc libc-filters libkstat ssp_ns gcc
 	    ROOT=$(SYSROOT) \
 	    aarch64_PRIMARY_CC=gcc10,$(CROSS)/bin/aarch64-unknown-solaris2.11-gcc,gnu \
 	    aarch64_SYSROOT=$(SYSROOT); \
-	    make -j $(MAX_JOBS) -e install_h && \
-	    make -j $(MAX_JOBS) -e install) && \
+	    make -e install_h && \
+	    make -e install) && \
 	touch $@
 
 openssl: $(STAMPS)/openssl-stamp
@@ -387,8 +388,8 @@ $(STAMPS)/openssl-stamp: libc libc-filters libsocket libnsl zlib ssp_ns gcc
 	    shared threads zlib enable-ec_nistp_64_gcc_128 no-asm \
 	    solaris-aarch64-gcc \
 	    && \
-	env PATH="$(CROSS)/bin/:$$PATH" gmake -j $(MAX_JOBS) && \
-	env PATH="$(CROSS)/bin/:$$PATH" gmake -j $(MAX_JOBS) install) && \
+	env PATH="$(CROSS)/bin/:$$PATH" gmake && \
+	env PATH="$(CROSS)/bin/:$$PATH" gmake install) && \
 	touch $@
 
 xorriso: $(STAMPS)/xorriso-stamp
@@ -401,19 +402,19 @@ $(STAMPS)/xorriso-stamp: libc libc-filters ssp_ns gcc
 	    --build=i386-pc-solaris2.11 \
 	    --host=aarch64-unknown-solaris2.11 \
 	    --prefix=$(SYSROOT)/usr && \
-	env PATH="$(CROSS)/bin/:$$PATH" gmake -j $(MAX_JOBS) && \
-	env PATH="$(CROSS)/bin/:$$PATH" gmake -j $(MAX_JOBS) install) && \
+	env PATH="$(CROSS)/bin/:$$PATH" gmake && \
+	env PATH="$(CROSS)/bin/:$$PATH" gmake install) && \
 	touch $@
 
 u-boot: $(STAMPS)/u-boot-stamp
 $(STAMPS)/u-boot-stamp:
 	cd u-boot && \
-	gmake V=1 O=$(PWD)/build/u-boot \
+	gmake -s V=1 O=$(PWD)/build/u-boot \
 	    HOSTCC="gcc -m64" \
 	    HOSTCFLAGS+="-I/opt/ooce/include" \
 	    HOSTLDLIBS+="-L/opt/ooce/lib/amd64 -lnsl -lsocket" \
 	    sandbox_defconfig && \
-	gmake V=1 O=$(PWD)/build/u-boot \
+	gmake -s V=1 O=$(PWD)/build/u-boot \
 	    HOSTCC="gcc -m64" \
 	    HOSTCFLAGS+="-I/opt/ooce/include" \
 	    HOSTLDLIBS+="-L/opt/ooce/lib/amd64 -lnsl -lsocket" tools && \
@@ -434,14 +435,14 @@ $(STAMPS)/dtc-stamp:
 illumos: $(STAMPS)/illumos-stamp
 $(STAMPS)/illumos-stamp: setup
 	(cd illumos-gate && \
-	 $(BLDENV) ../env/aarch64 'cd usr/src; make -j $(MAX_JOBS) setup' && \
-	 $(BLDENV) ../env/aarch64 'cd usr/src; make -j $(MAX_JOBS) install') && \
+	 $(BLDENV) ../env/aarch64 'cd usr/src; make setup' && \
+	 $(BLDENV) ../env/aarch64 'cd usr/src; make install') && \
 	touch $@
 
 illumos-pkgs: $(STAMPS)/illumos-pkgs
 $(STAMPS)/illumos-pkgs:
 	(cd illumos-gate && \
-	 $(BLDENV) ../env/aarch64 'cd usr/src/pkg; make -j $(MAX_JOBS) install') && \
+	 $(BLDENV) ../env/aarch64 'cd usr/src/pkg; make install') && \
 	touch $@
 
 disk: illumos-pkgs
@@ -467,7 +468,7 @@ clean-illumos:
 	(cd illumos-gate && \
 	 rm -fr packages && \
 	 rm -fr proto && \
-	 $(BLDENV) ../env/aarch64 'cd usr/src; make -j $(MAX_JOBS) clobber')
+	 $(BLDENV) ../env/aarch64 'cd usr/src; make clobber')
 
 # XXXARM: I am, once again, sorry about this.
 clean-nss:
@@ -481,7 +482,7 @@ clean-nss:
 	    ROOT=$(SYSROOT) \
 	    aarch64_PRIMARY_CC=gcc10,$(CROSS)/bin/aarch64-unknown-solaris2.11-gcc,gnu \
 	    aarch64_SYSROOT=$(SYSROOT); \
-	    make -j $(MAX_JOBS) -e clobber)
+	    make -e clobber)
 
 clean: clean-dtc clean-illumos clean-nss
 	rm -fr $(SYSROOT) $(BUILDS) $(STAMPS) $(CROSS)
