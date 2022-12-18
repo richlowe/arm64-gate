@@ -7,7 +7,7 @@ POOL=armpool
 MNT=/mnt
 ROOTFS=ROOT/braich
 ROOT=$MNT/$ROOTFS
-DISKSIZE=4g
+DISKSIZE=6g
 
 if [[ ! -f Makefile || ! -d illumos-gate ]]; then
 	print -u2 "$0 should be run from the root of arm64-gate"
@@ -37,6 +37,7 @@ sudo zpool create -f -t $POOL -dm $MNT $POOL $SLICE
 sudo zfs create -o canmount=noauto $POOL/ROOT
 sudo zfs create $POOL/$ROOTFS
 sudo zfs create -V 1G $POOL/swap
+sudo zfs create -V 1G $POOL/dump
 
 # for reasons I can't fathom, synthetic packages don't get published right now
 pkgsend publish -s illumos-gate/packages/aarch64/nightly/repo.redist \
@@ -95,6 +96,15 @@ echo "braich" | sudo tee -a $ROOT/etc/nodename > /dev/null
 # Have some swap space
 echo "/dev/zvol/dsk/$POOL/swap	-	-	swap	-	no	-" | \
 	sudo tee -a $ROOT/etc/vfstab >/dev/null
+
+# Have a dump device
+cat <<EOF  | sudo tee -a $ROOT/etc/dumpadm.conf >/dev/null
+DUMPADM_DEVICE=/dev/zvol/dsk/$POOL/dump
+DUMPADM_SAVDIR=/var/crash/braich
+DUMPADM_CONTENT=kernel
+DUMPADM_ENABLE=yes
+DUMPADM_CSAVE=on
+EOF
 
 # Put the SMF profiles in place
 sudo ln -s ns_files.xml $ROOT/etc/svc/profile/name_service.xml
