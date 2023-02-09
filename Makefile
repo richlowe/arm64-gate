@@ -121,7 +121,7 @@ $(STAMPS)/binutils-gdb-stamp:
 	(cd $(BUILDS)/binutils-gdb && \
 	../../binutils-gdb/configure \
 	    --with-sysroot \
-	    --target=aarch64-solaris2.11 \
+	    --target=aarch64-unknown-solaris2.11 \
 	    --prefix=$(CROSS) \
 	    --enable-initfini-array && \
 	gmake -j $(MAX_JOBS) CPPFLAGS+='-I$(GMPINCDIR)' && \
@@ -144,7 +144,7 @@ $(STAMPS)/gcc-stamp: sgs binutils-gdb
 	(cd $(BUILDS)/gcc; \
 	../../gcc/configure \
 	    --with-gmp-include=$(GMPINCDIR) \
-	    --target=aarch64-solaris2.11 \
+	    --target=aarch64-unknown-solaris2.11 \
 	    --with-abi=lp64 \
 	    --prefix=$(CROSS) \
 	    --enable-languages=c,c++ \
@@ -165,12 +165,12 @@ $(STAMPS)/gcc-stamp: sgs binutils-gdb
 	    --enable-initfini-array \
 	    --with-headers=$(SYSROOT)/usr/include \
 	    --with-gnu-as \
-	    --with-as=$(CROSS)/bin/aarch64-solaris2.11-as \
+	    --with-as=$(CROSS)/bin/aarch64-unknown-solaris2.11-as \
 	    --without-gnu-ld \
 	    --with-ld=$(CROSS)/opt/onbld/bin/amd64/ld && \
 	gmake -j $(MAX_JOBS) && \
 	gmake -j $(MAX_JOBS) install && \
-	rm -fr $(SYSROOT)/lib/gcc/aarch64-solaris2.11/10.3.0/include-fixed) && \
+	rm -fr $(CROSS)/lib/gcc/aarch64-unknown-solaris2.11/10.3.0/include-fixed) && \
 	touch $@
 
 crt: $(STAMPS)/crt-stamp
@@ -255,10 +255,10 @@ zlib: $(STAMPS)/zlib-stamp
 $(STAMPS)/zlib-stamp: libc ssp_ns gcc
 	(cd build/zlib && \
 	  env PATH="$(CROSS)/bin:$$PATH" \
-	      CC=$(CROSS)/bin/aarch64-solaris2.11-gcc \
-	      AR=$(CROSS)/bin/aarch64-solaris2.11-ar \
-	      RANLIB=$(CROSS)/bin/aarch64-solaris2.11-ar \
-	      LDSHARED="$(CROSS)/bin/aarch64-solaris2.11-gcc -shared" \
+	      CC=$(CROSS)/bin/aarch64-unknown-solaris2.11-gcc \
+	      AR=$(CROSS)/bin/aarch64-unknown-solaris2.11-ar \
+	      RANLIB=$(CROSS)/bin/aarch64-unknown-solaris2.11-ar \
+	      LDSHARED="$(CROSS)/bin/aarch64-unknown-solaris2.11-gcc -shared" \
 	      CFLAGS="--sysroot=$(SYSROOT) -fpic" \
 	  ../../zlib-1.2.12/configure --shared --prefix=$(SYSROOT)/usr && \
 	  env PATH="$(CROSS)/bin:$$PATH" gmake -j $(MAX_JOBS) && \
@@ -269,10 +269,10 @@ libxml2: $(STAMPS)/libxml2-stamp
 $(STAMPS)/libxml2-stamp: libc libm libmp libmd zlib ssp_ns gcc
 	(cd build/libxml2 && \
 	env PATH="$(CROSS)/bin:$$PATH" \
-	    CC=$(CROSS)/bin/aarch64-solaris2.11-gcc \
+	    CC=$(CROSS)/bin/aarch64-unknown-solaris2.11-gcc \
 	    CFLAGS="--sysroot=$(SYSROOT)" \
 	 ../../libxml2-2.9.9/configure \
-	    --host=aarch64-solaris2.11 \
+	    --host=aarch64-unknown-solaris2.11 \
 	    --with-sysroot=$(SYSROOT) \
 	    --prefix=$(SYSROOT)/usr \
 	    --without-zlib \
@@ -286,10 +286,10 @@ idnkit: $(STAMPS)/idnkit-stamp
 $(STAMPS)/idnkit-stamp: libc ssp_ns gcc
 	(cd build/idnkit && \
 	 env PATH="$(CROSS)/bin:$$PATH" \
-	 CC=$(CROSS)/bin/aarch64-solaris2.11-gcc \
+	 CC=$(CROSS)/bin/aarch64-unknown-solaris2.11-gcc \
 	    CFLAGS="--sysroot=$(SYSROOT)" \
 	 ../../idnkit-2.3/configure \
-	    --host=aarch64-solaris2.11 \
+	    --host=aarch64-unknown-solaris2.11 \
 	    --with-sysroot=$(SYSROOT) \
 	    --prefix=$(SYSROOT)/usr && \
 	 env PATH="$(CROSS)/bin:$$PATH" gmake -j $(MAX_JOBS) && \
@@ -326,14 +326,14 @@ libstdc++: $(STAMPS)/libstdc++-stamp
 $(STAMPS)/libstdc++-stamp: libc libc-filters ssp_ns gcc
 	(cd build/libstdc++ && \
 	 env PATH="$(CROSS)/bin:$$PATH" \
-	    CC=$(CROSS)/bin/aarch64-solaris2.11-gcc \
-	    CXX=$(CROSS)/bin/aarch64-solaris2.11-g++ \
+	    CC=$(CROSS)/bin/aarch64-unknown-solaris2.11-gcc \
+	    CXX=$(CROSS)/bin/aarch64-unknown-solaris2.11-g++ \
 	    CFLAGS="--sysroot=$(SYSROOT) -mno-outline-atomics -mtls-dialect=trad" \
 	    CXXFLAGS="--sysroot=$(SYSROOT) -mno-outline-atomics -mtls-dialect=trad" \
 	    LDFLAGS="--sysroot=$(SYSROOT)" \
 	    CPPFLAGS="-I$(SYSROOT)/usr/include" \
 	../../gcc/libstdc++-v3/configure \
-	    --host=aarch64-solaris2.11 \
+	    --host=aarch64-unknown-solaris2.11 \
 	    --prefix=$(SYSROOT)/usr && \
 	env PATH="$(CROSS)/bin:$$PATH" gmake -j $(MAX_JOBS) && \
 	env PATH="$(CROSS)/bin:$$PATH" gmake -j $(MAX_JOBS) install) && \
@@ -343,10 +343,10 @@ nspr: $(STAMPS)/nspr-stamp
 $(STAMPS)/nspr-stamp: libc libc-filters ssp_ns gcc
 	(cd build/nspr && \
 	 env PATH="$(CROSS)/bin/:$$PATH" \
-         CC="$(CROSS)/bin/aarch64-solaris2.11-gcc --sysroot=$(SYSROOT)" \
+         CC="$(CROSS)/bin/aarch64-unknown-solaris2.11-gcc --sysroot=$(SYSROOT)" \
 	 ../../nspr/configure \
 	    --build=i386-pc-solaris2.11 \
-	    --target=aarch64-solaris2.11 \
+	    --target=aarch64-unknown-solaris2.11 \
 	    --prefix=$(SYSROOT) \
 	    --libdir=$(SYSROOT)/usr/lib/mps \
 	    --bindir=$(SYSROOT)/usr/bin \
@@ -366,7 +366,7 @@ $(STAMPS)/nss-stamp: libc libc-filters libkstat ssp_ns gcc
 	    NSS_BUILD=$(PWD) \
 	    ONBLD_TOOLS=$(PWD)/illumos-gate/usr/src/tools/proto/root_i386-nd/opt/onbld \
 	    ROOT=$(SYSROOT) \
-	    aarch64_PRIMARY_CC=gcc10,$(CROSS)/bin/aarch64-solaris2.11-gcc,gnu \
+	    aarch64_PRIMARY_CC=gcc10,$(CROSS)/bin/aarch64-unknown-solaris2.11-gcc,gnu \
 	    aarch64_SYSROOT=$(SYSROOT); \
 	    make -j $(MAX_JOBS) -e install_h && \
 	    make -j $(MAX_JOBS) -e install) && \
@@ -382,7 +382,7 @@ $(STAMPS)/openssl-stamp: libc libc-filters libsocket libnsl zlib ssp_ns gcc
 	 MAKE=gmake \
 	 ../../openssl-3.0.7/Configure \
 	    --prefix=$(SYSROOT)/usr \
-	    --cross-compile-prefix=aarch64-solaris2.11- \
+	    --cross-compile-prefix=aarch64-unknown-solaris2.11- \
 	    --api=1.1.1 \
 	    shared threads zlib enable-ec_nistp_64_gcc_128 no-asm \
 	    solaris-aarch64-gcc \
@@ -395,11 +395,11 @@ xorriso: $(STAMPS)/xorriso-stamp
 $(STAMPS)/xorriso-stamp: libc libc-filters ssp_ns gcc
 	(cd build/xorriso && \
 	 env PATH="$(CROSS)/bin/:$$PATH" \
-         CC="$(CROSS)/bin/aarch64-solaris2.11-gcc --sysroot=$(SYSROOT)" \
+         CC="$(CROSS)/bin/aarch64-unknown-solaris2.11-gcc --sysroot=$(SYSROOT)" \
 	 MAKE=gmake \
 	 ../../xorriso-1.5.4/configure \
 	    --build=i386-pc-solaris2.11 \
-	    --host=aarch64-solaris2.11 \
+	    --host=aarch64-unknown-solaris2.11 \
 	    --prefix=$(SYSROOT)/usr && \
 	env PATH="$(CROSS)/bin/:$$PATH" gmake -j $(MAX_JOBS) && \
 	env PATH="$(CROSS)/bin/:$$PATH" gmake -j $(MAX_JOBS) install) && \
@@ -479,7 +479,7 @@ clean-nss:
 	    NSS_BUILD=$(PWD) \
 	    ONBLD_TOOLS=$(PWD)/illumos-gate/usr/src/tools/proto/root_i386-nd/opt/onbld \
 	    ROOT=$(SYSROOT) \
-	    aarch64_PRIMARY_CC=gcc10,$(CROSS)/bin/aarch64-solaris2.11-gcc,gnu \
+	    aarch64_PRIMARY_CC=gcc10,$(CROSS)/bin/aarch64-unknown-solaris2.11-gcc,gnu \
 	    aarch64_SYSROOT=$(SYSROOT); \
 	    make -j $(MAX_JOBS) -e clobber)
 

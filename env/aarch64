@@ -118,20 +118,20 @@ export i386_SHADOW_CCS=gcc10,$i386_GNUC_10_ROOT/bin/gcc,gnu
 export i386_SHADOW_CCCS=gcc10,$i386_GNUC_10_ROOT/bin/g++,gnu
 
 export aarch64_GNUC_ROOT=${CODEMGR_WS}/../cross/
-export aarch64_PRIMARY_CC=gcc10,$aarch64_GNUC_ROOT/bin/aarch64-solaris2.11-gcc,gnu
-export aarch64_PRIMARY_CCC=gcc10,$aarch64_GNUC_ROOT/bin/aarch64-solaris2.11-g++,gnu
+export aarch64_PRIMARY_CC=gcc10,$aarch64_GNUC_ROOT/bin/aarch64-unknown-solaris2.11-gcc,gnu
+export aarch64_PRIMARY_CCC=gcc10,$aarch64_GNUC_ROOT/bin/aarch64-unknown-solaris2.11-g++,gnu
 
 export AW_aarch64_AS_DIR=${CODEMGR_WS}/../cross/bin
 export AW_aarch64_AS64_DIR=${CODEMGR_WS}/../cross/bin
-export AW_aarch64_AS=${CODEMGR_WS}/../cross/bin/aarch64-solaris2.11-as
-export AW_aarch64_AS64=${CODEMGR_WS}/../cross/bin/aarch64-solaris2.11-as
+export AW_aarch64_AS=${CODEMGR_WS}/../cross/bin/aarch64-unknown-solaris2.11-as
+export AW_aarch64_AS64=${CODEMGR_WS}/../cross/bin/aarch64-unknown-solaris2.11-as
 
 export aarch64_SYSROOT=${CODEMGR_WS}/../sysroot/
 
 export ADJUNCT_PROTO=${aarch64_SYSROOT}
-export GLD=${CODEMGR_WS}/../cross/bin/aarch64-solaris2.11-ld
-export OBJCOPY=${CODEMGR_WS}/../cross/bin/aarch64-solaris2.11-objcopy
-export ANSI_CPP=${CODEMGR_WS}/../cross/bin/aarch64-solaris2.11-cpp
+export GLD=${CODEMGR_WS}/../cross/bin/aarch64-unknown-solaris2.11-ld
+export OBJCOPY=${CODEMGR_WS}/../cross/bin/aarch64-unknown-solaris2.11-objcopy
+export ANSI_CPP=${CODEMGR_WS}/../cross/bin/aarch64-unknown-solaris2.11-cpp
 export MKIMAGE=${CODEMGR_WS}/../build/u-boot/tools/mkimage
 export DTC=${CODEMGR_WS}/../cross/bin/dtc
 
