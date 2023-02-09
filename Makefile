@@ -328,8 +328,8 @@ $(STAMPS)/libstdc++-stamp: libc libc-filters ssp_ns gcc
 	 env PATH="$(CROSS)/bin:$$PATH" \
 	    CC=$(CROSS)/bin/aarch64-solaris2.11-gcc \
 	    CXX=$(CROSS)/bin/aarch64-solaris2.11-g++ \
-	    CFLAGS="--sysroot=$(SYSROOT) -mno-outline-atomics" \
-	    CXXFLAGS="--sysroot=$(SYSROOT) -mno-outline-atomics" \
+	    CFLAGS="--sysroot=$(SYSROOT) -mno-outline-atomics -mtls-dialect=trad" \
+	    CXXFLAGS="--sysroot=$(SYSROOT) -mno-outline-atomics -mtls-dialect=trad" \
 	    LDFLAGS="--sysroot=$(SYSROOT)" \
 	    CPPFLAGS="-I$(SYSROOT)/usr/include" \
 	../../gcc/libstdc++-v3/configure \
