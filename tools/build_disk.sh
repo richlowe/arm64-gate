@@ -2,19 +2,20 @@
 
 set -e
 
-DISK=$PWD/qemu-setup/illumos-disk.img
+QEMU_FOLDER=${BUILDS}/qemu-setup
+DISK=${QEMU_FOLDER}/illumos-disk.img
 POOL=armpool
 MNT=/mnt
 ROOTFS=ROOT/braich
 ROOT=$MNT/$ROOTFS
 DISKSIZE=6g
 
-if [[ ! -f Makefile || ! -d illumos-gate ]]; then
+if [[ ! -f Makefile || ! -d ${ARCHIVES}/illumos-gate ]]; then
 	print -u2 "$0 should be run from the root of arm64-gate"
 	exit 2
 fi
 
-mkdir -p $PWD/qemu-setup
+mkdir -p ${QEMU_FOLDER}
 
 mkfile $DISKSIZE $DISK
 
@@ -47,7 +48,7 @@ pkgsend publish -s illumos-gate/packages/aarch64/nightly/repo.redist \
 
 sudo pkg image-create -F \
      --variant variant.arch=aarch64 \
-     -p $PWD/illumos-gate/packages/aarch64/nightly/repo.redist $MNT/$ROOTFS
+     -p ${ARCHIVES}/illumos-gate/packages/aarch64/nightly/repo.redist $MNT/$ROOTFS
 
 sudo pkg -R $ROOT set-property flush-content-cache-on-success True
 
@@ -91,6 +92,7 @@ echo "set kmem_flags = 0x6" | sudo tee -a $ROOT/etc/system > /dev/null
 sudo sed -i'' -e 's/PASSREQ=YES/PASSREQ=NO/' $ROOT/etc/default/login
 
 # Have a host name etc, in case dhcp
+# Note this is the Welsh meaning of braich not the Irish one
 echo "braich" | sudo tee -a $ROOT/etc/nodename > /dev/null
 
 # Have some swap space
@@ -148,4 +150,4 @@ sudo zfs set mountpoint=/ $POOL/$ROOTFS
 sudo zpool export $POOL
 sudo lofiadm -d $DISK
 
-cp illumos-gate/proto/root_aarch64/platform/QEMU,virt-4.1/inetboot.bin qemu-setup
+cp $(ARCHIVES)/illumos-gate/proto/root_aarch64/platform/QEMU,virt-4.1/inetboot.bin $(QEMU_FOLDER)
