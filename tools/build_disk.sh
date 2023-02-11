@@ -74,8 +74,9 @@ sudo cp sysroot/usr/lib/libssl* $ROOT/lib
 sudo cp sysroot/usr/lib/libssl* $ROOT/usr/lib
 sudo cp sysroot/usr/lib/libcrypto* $ROOT/lib
 sudo cp sysroot/usr/lib/libcrypto* $ROOT/usr/lib
-sudo cp sysroot/usr/lib/libstdc* $ROOT/lib
-sudo cp sysroot/usr/lib/libstdc* $ROOT/usr/lib
+sudo cp cross/aarch64-unknown-solaris2.11/lib/libstdc++.so* $ROOT/usr/lib
+sudo cp cross/aarch64-unknown-solaris2.11/lib/libgcc_s.so* $ROOT/lib
+sudo cp cross/aarch64-unknown-solaris2.11/lib/libgcc_s.so* $ROOT/usr/lib
 sudo rsync -a sysroot/usr/lib/mps/ $ROOT/usr/lib/mps/
 
 # Drop in xorrisofs both as itself, and as mkisofs, so we can have HSFS

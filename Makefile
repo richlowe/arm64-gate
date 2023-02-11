@@ -27,6 +27,7 @@ GMPINCDIR= /usr/include/gmp
 
 SETUP_TARGETS =		\
 	binutils-gdb 	\
+	boot-gcc	\
 	crt		\
 	dtc		\
 	gcc		\
@@ -38,7 +39,6 @@ SETUP_TARGETS =		\
 	libmd		\
 	libnsl		\
 	libsocket	\
-	libstdc++	\
 	libxml2		\
 	nspr		\
 	nss		\
@@ -139,9 +139,11 @@ $(STAMPS)/sgs-stamp:
 	touch $@
 
 # Note lp64 only, the default is multilib
-gcc: $(STAMPS)/gcc-stamp
-$(STAMPS)/gcc-stamp: sgs binutils-gdb
-	(cd $(BUILDS)/gcc; \
+# This is the bootstrap GCC used to build bootstrap bits we can then use when
+# building a real GCC
+boot-gcc: $(STAMPS)/boot-gcc-stamp
+$(STAMPS)/boot-gcc-stamp: sgs binutils-gdb
+	(cd $(BUILDS)/boot-gcc; \
 	../../gcc/configure \
 	    --with-gmp-include=$(GMPINCDIR) \
 	    --target=aarch64-unknown-solaris2.11 \
@@ -151,6 +153,7 @@ $(STAMPS)/gcc-stamp: sgs binutils-gdb
 	    --with-build-sysroot=$(SYSROOT) \
 	    --disable-shared \
 	    --enable-c99 \
+	    --disable-libstdcxx \
 	    --disable-libquadmath \
 	    --disable-libmudflag \
 	    --disable-libgomp \
@@ -173,8 +176,42 @@ $(STAMPS)/gcc-stamp: sgs binutils-gdb
 	rm -fr $(CROSS)/lib/gcc/aarch64-unknown-solaris2.11/10.3.0/include-fixed) && \
 	touch $@
 
+gcc: $(STAMPS)/gcc-stamp
+$(STAMPS)/gcc-stamp: sgs binutils-gdb crt libc libm
+	(cd $(BUILDS)/gcc; \
+	env CFLAGS_FOR_TARGET="-g -O2 -mno-outline-atomics -mtls-dialect=trad" \
+	    CXXFLAGS_FOR_TARGET="-g -O2 -mno-outline-atomics -mtls-dialect=trad" \
+	../../gcc/configure \
+	    --with-gmp-include=$(GMPINCDIR) \
+	    --target=aarch64-unknown-solaris2.11 \
+	    --with-abi=lp64 \
+	    --prefix=$(CROSS) \
+	    --enable-languages=c,c++ \
+	    --with-build-sysroot=$(SYSROOT) \
+	    --enable-c99 \
+	    --disable-libquadmath \
+	    --disable-libmudflag \
+	    --disable-libgomp \
+	    --disable-decimal-float \
+	    --disable-libitm \
+	    --disable-libsanitizer \
+	    --disable-libvtv \
+	    --disable-libcilkcrts \
+	    --with-system-zlib \
+	    --enable-__cxa-atexit \
+	    --enable-initfini-array \
+	    --with-headers=$(SYSROOT)/usr/include \
+	    --with-gnu-as \
+	    --with-as=$(CROSS)/bin/aarch64-unknown-solaris2.11-as \
+	    --without-gnu-ld \
+	    --with-ld=$(CROSS)/opt/onbld/bin/amd64/ld && \
+	gmake -j $(MAX_JOBS) && \
+	gmake -j $(MAX_JOBS) install && \
+	rm -fr $(CROSS)/lib/gcc/aarch64-unknown-solaris2.11/10.3.0/include-fixed) && \
+	touch $@
+
 crt: $(STAMPS)/crt-stamp
-$(STAMPS)/crt-stamp: sgs gcc
+$(STAMPS)/crt-stamp: sgs boot-gcc
 	(cd illumos-gate && \
 	$(BLDENV) ../env/aarch64 'cd usr/src/lib/crt; make -j $(MAX_JOBS) install' && \
 	mkdir -p $(SYSROOT)/usr/lib/aarch64 && \
@@ -182,7 +219,7 @@ $(STAMPS)/crt-stamp: sgs gcc
 	touch $@
 
 libc: $(STAMPS)/libc-stamp
-$(STAMPS)/libc-stamp: ssp_ns gcc
+$(STAMPS)/libc-stamp: ssp_ns boot-gcc
 	(cd illumos-gate && \
 	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libc; make -j $(MAX_JOBS) install' && \
 	mkdir -p $(SYSROOT)/usr/lib && \
@@ -192,7 +229,7 @@ $(STAMPS)/libc-stamp: ssp_ns gcc
 	touch $@
 
 libm: $(STAMPS)/libm-stamp
-$(STAMPS)/libm-stamp: ssp_ns gcc
+$(STAMPS)/libm-stamp: ssp_ns boot-gcc
 	(cd illumos-gate && \
 	$(BLDENV) ../env/aarch64 'cd usr/src/lib/libm_aarch64; make -j $(MAX_JOBS) install' && \
 	mkdir -p $(SYSROOT)/usr/lib && \
@@ -297,7 +334,7 @@ $(STAMPS)/idnkit-stamp: libc ssp_ns gcc
 	touch $@
 
 ssp_ns: $(STAMPS)/ssp_ns-stamp
-$(STAMPS)/ssp_ns-stamp: gcc
+$(STAMPS)/ssp_ns-stamp: boot-gcc
 	(cd illumos-gate && \
 	$(BLDENV) ../env/aarch64 'cd usr/src/lib/ssp_ns && make -j $(MAX_JOBS) install' && \
 	mkdir -p $(SYSROOT)/usr/lib && \
@@ -320,23 +357,6 @@ $(STAMPS)/libc-filters-stamp: libc gcc
 	rsync -a proto/root_aarch64/lib/libdl.* $(SYSROOT)/lib/ && \
 	rsync -a proto/root_aarch64/lib/libposix4.* $(SYSROOT)/lib/ && \
 	rsync -a proto/root_aarch64/lib/libpthread.* $(SYSROOT)/lib/) && \
-	touch $@
-
-libstdc++: $(STAMPS)/libstdc++-stamp
-$(STAMPS)/libstdc++-stamp: libc libc-filters ssp_ns gcc
-	(cd build/libstdc++ && \
-	 env PATH="$(CROSS)/bin:$$PATH" \
-	    CC=$(CROSS)/bin/aarch64-unknown-solaris2.11-gcc \
-	    CXX=$(CROSS)/bin/aarch64-unknown-solaris2.11-g++ \
-	    CFLAGS="--sysroot=$(SYSROOT) -mno-outline-atomics -mtls-dialect=trad" \
-	    CXXFLAGS="--sysroot=$(SYSROOT) -mno-outline-atomics -mtls-dialect=trad" \
-	    LDFLAGS="--sysroot=$(SYSROOT)" \
-	    CPPFLAGS="-I$(SYSROOT)/usr/include" \
-	../../gcc/libstdc++-v3/configure \
-	    --host=aarch64-unknown-solaris2.11 \
-	    --prefix=$(SYSROOT)/usr && \
-	env PATH="$(CROSS)/bin:$$PATH" gmake -j $(MAX_JOBS) && \
-	env PATH="$(CROSS)/bin:$$PATH" gmake -j $(MAX_JOBS) install) && \
 	touch $@
 
 nspr: $(STAMPS)/nspr-stamp
