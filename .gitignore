@@ -9,6 +9,8 @@ reference/
 stamps/
 zlib-1.2.12/
 openssl-3.0.7/
+perl-5.36.0/
+perl-cross-1.4/
 xorriso-1.5.4/
 dtc-1.6.1/
 

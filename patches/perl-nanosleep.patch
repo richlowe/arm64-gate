@@ -1,0 +1,14 @@
+$d_nanosleep somehow ends up empty (instead of define/undef)
+for cross builds which leads to a syntax error
+diff -wpruN '--exclude=*.orig' a~/config_h.SH a/config_h.SH
+--- a~/config_h.SH	1970-01-01 00:00:00
++++ a/config_h.SH	1970-01-01 00:00:00
+@@ -3111,7 +3111,7 @@ sed <<!GROK!THIS! >$CONFIG_H -e 's!^#und
+  *	This symbol, if defined, indicates that the nanosleep
+  *	system call is available to sleep with 1E-9 sec accuracy.
+  */
+-#$d_nanosleep HAS_NANOSLEEP		/**/
++#define HAS_NANOSLEEP		/**/
+ 
+ /* HAS_NEARBYINT:
+  *	This symbol, if defined, indicates that the nearbyint routine is

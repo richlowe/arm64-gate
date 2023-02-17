@@ -43,6 +43,7 @@ SETUP_TARGETS =		\
 	nspr		\
 	nss		\
 	openssl		\
+	perl		\
 	sgs		\
 	ssp_ns		\
 	u-boot		\
@@ -59,6 +60,7 @@ DOWNLOADS=		\
 	nspr		\
 	nss		\
 	openssl		\
+	perl		\
 	u-boot		\
 	xorriso		\
 	zlib
@@ -82,6 +84,14 @@ download-openssl: $(ARCHIVES)
 	tar xf archives/openssl-3.0.7.tar.gz openssl-3.0.7
 	cp files/openssl-15-illumos-aarch.conf \
 	    openssl-3.0.7/Configurations/15-illumos-aarch.conf
+
+download-perl: $(ARCHIVES)
+	wget -O archives/perl-5.36.0.tar.gz https://www.cpan.org/src/5.0/perl-5.36.0.tar.gz
+	tar xf archives/perl-5.36.0.tar.gz
+	wget -O archives/perl-cross-1.4.tar.gz https://github.com/arsv/perl-cross/releases/download/1.4/perl-cross-1.4.tar.gz
+	tar xf archives/perl-cross-1.4.tar.gz
+	rsync -a perl-cross-1.4/* perl-5.36.0/
+	(cd perl-5.36.0 && patch -p1 < ../patches/perl-nanosleep.patch)
 
 download-gcc: $(ARCHIVES)
 	git clone --shallow-since=2019-01-01 -b il-10_3_0-arm64 https://github.com/richlowe/gcc
@@ -409,6 +419,51 @@ $(STAMPS)/openssl-stamp: libc libc-filters libsocket libnsl zlib ssp_ns gcc
 	    && \
 	env PATH="$(CROSS)/bin/:$$PATH" gmake -j $(MAX_JOBS) && \
 	env PATH="$(CROSS)/bin/:$$PATH" gmake -j $(MAX_JOBS) install) && \
+	touch $@
+
+# XXXARM:
+# out of tree build is broken for the cross miniperl
+# the cross miniperl build requires gnu tools
+# miniperl is racy (i.e. xconfig.h is not re-generated before the build uses it)
+perl: $(STAMPS)/perl-stamp
+$(STAMPS)/perl-stamp: libsocket libnsl libm libc gcc
+	(cd perl-5.36.0 && \
+	env PATH="/usr/gnu/bin:$$PATH" \
+	./configure \
+	    --target=aarch64-unknown-solaris2.11 \
+	    --host-libs="m" \
+	    --host-set-osname=solaris \
+	    --sysroot=$(SYSROOT) \
+	    -Dccdlflags= \
+	    -Dusethreads \
+	    -Duseshrplib \
+	    -Dusemultiplicity \
+	    -Duselargefiles \
+	    -Duse64bitall \
+	    -Dmyhostname=localhost \
+	    -Umydomain \
+	    -Dmyuname=sunos \
+	    -Dosname=solaris \
+	    -Dcc=$(CROSS)/bin/aarch64-unknown-solaris2.11-gcc \
+	    -Dcpp=$(CROSS)/bin/aarch64-unknown-solaris2.11-cpp \
+	    -Dar=$(CROSS)/bin/aarch64-unknown-solaris2.11-ar \
+	    -Dnm=$(CROSS)/bin/aarch64-unknown-solaris2.11-nm \
+	    -Dranlib=$(CROSS)/bin/aarch64-unknown-solaris2.11-ranlib \
+	    -Dreadelf=$(CROSS)/bin/aarch64-unknown-solaris2.11-readelf \
+	    -Dobjdump=$(CROSS)/bin/aarch64-unknown-solaris2.11-objdump \
+	    -Doptimize="-O3" \
+	    -Dprefix=$(CROSS)/usr/perl5/5.36 \
+	    -Ulocincpth= \
+	    -Uloclibpth= && \
+	sed -i "s/^d_unsetenv=.*/d_unsetenv='undef'/g" xconfig.sh && \
+	gmake miniperl && \
+	gmake -j $(MAX_JOBS) modules && \
+	mkdir -p $(CROSS)/usr/perl5/5.36/bin && \
+	mkdir -p $(CROSS)/usr/perl5/5.36/lib/aarch64-solaris-64/CORE && \
+	cp -f miniperl $(CROSS)/usr/perl5/5.36/bin/perl && \
+	rsync -a lib/* $(CROSS)/usr/perl5/5.36/lib/aarch64-solaris-64/ && \
+	ln -sf ./aarch64-solaris-64/ExtUtils $(CROSS)/usr/perl5/5.36/lib/ExtUtils && \
+	cp -f *.h $(CROSS)/usr/perl5/5.36/lib/aarch64-solaris-64/CORE/) && \
 	touch $@
 
 xorriso: $(STAMPS)/xorriso-stamp
