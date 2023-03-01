@@ -46,11 +46,10 @@ and spurious rebuilds.  Please do fix this.
 Take the `illumos-disk.img` you have built, and the `inetboot.bin` for your
 platform (likely qemu) out of the proto area, and supply them to `qemu`
 
-I use something like this (on another system at present, as modern qemu has
-issues under illumos):
+I use something like this:
 
 ```
-sudo qemu-system-aarch64 -nographic -machine virt-4.1 -m 2g -smp 2 -cpu cortex-a53 -kernel inetboot.bin -append "-D /virtio_mmio@a003c00" -netdev bridge,id=net0,br=virbr0 -device virtio-net-device,netdev=net0,mac=52:54:00:70:0a:e4 -device virtio-blk-device,drive=hd0 -drive file=$PWD/illumos-disk.img,format=raw,id=hd0,if=none
+sudo qemu-system-aarch64 -nographic -machine virt-4.1 -m 2g -smp 2 -cpu cortex-a53 -kernel inetboot.bin -append "-D /virtio_mmio@a003c00" -netdev vnic,ifname=braich0,id=net0 -device virtio-net-device,netdev=net0,mac=52:54:00:70:0a:e4 -device virtio-blk-device,drive=hd0 -drive file=$PWD/illumos-disk.img,format=raw,id=hd0,if=none
 ```
 
 - `-nographic` -- serial console on stdout
@@ -61,9 +60,9 @@ sudo qemu-system-aarch64 -nographic -machine virt-4.1 -m 2g -smp 2 -cpu cortex-a
 - `-kernel inetboot.bin` -- the inetboot.bin for qemu taken from the illumos
   build
 - `-append "-D /virtio_mmio@a003c00"` -- tell inetboot where to boot from
-- `-netdev bridge,id=net0,br=virbr0` -- bridged networking, linuxily
+- `-netdev vnic,ifname=braich0,id=net0` -- vnic networking
 - `-device virtio-net-device,netdev=net0,mac=52:54:00:70:0a:e4` -- virtual
-  NIC, `platmac0` in the system
+  NIC, `vioif0` in the system. The MAC must match your vnic.
 - `-device virtio-blk-device,drive=hd0` -- our disk
 - `-drive file=illumos-disk.img,format=raw,id=hd0,if=none` -- the illumos disk
   image you want to boot.
@@ -73,11 +72,10 @@ directory.  Note that the default configuration we use is trying to strike a
 balance between running on smaller systems and booting in an even vaguely
 tolerable amount of time.  It is a balance we have not yet reached.
 
-> **Note:** the networking configuration here is important, you need to have _a_
-> networking device for the device tree to be what we expect right now.  The
-> configuration above and in `run.sh` is for qemu on linux using bridge
-> networking, and assumes that `libvirtd` is running and that `qemu` is allowed
-> to use the `virbr0` bridge it creates.  If this is inappropriate for you, you
+> **Note:** the networking configuration here is important, you need to have
+> _a_ networking device for the device tree to be what we expect right now.
+> The configuration above and in `run.sh` is for qemu on illumos using vnic
+> networking, using a vnic `braich0`.  If this is inappropriate for you, you
 > need to provide _an_ alternative, in the worst case user networking `-netdev
 > user,id=net0`.
 
