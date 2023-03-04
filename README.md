@@ -41,6 +41,10 @@ To build there are three-ish steps
 This is rough around the edges, particularly regarding `Makefile` dependencies
 and spurious rebuilds.  Please do fix this.
 
+Note that `make sysroot` and `make download-omnios` may be run multiple times
+as you work to keep those pieces up-to-date, the latter is especially useful
+as that goes into the disk image we create.
+
 ## Booting
 
 Take the `illumos-disk.img` you have built, and the `inetboot.bin` for your

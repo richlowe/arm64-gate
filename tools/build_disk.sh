@@ -7,7 +7,7 @@ POOL=armpool
 MNT=/mnt
 ROOTFS=ROOT/braich
 ROOT=$MNT/$ROOTFS
-DISKSIZE=6g
+DISKSIZE=8g
 
 if [[ ! -f Makefile || ! -d illumos-gate ]]; then
 	print -u2 "$0 should be run from the root of arm64-gate"
@@ -45,54 +45,47 @@ pkgsend publish -s illumos-gate/packages/aarch64/nightly/repo.redist \
 pkgsend publish -s illumos-gate/packages/aarch64/nightly/repo.redist \
     illumos-gate/usr/src/pkg/packages.aarch64/osnet-redist.mog
 
-sudo pkg image-create -F \
-     --variant variant.arch=aarch64 \
-     -p $PWD/illumos-gate/packages/aarch64/nightly/repo.redist $MNT/$ROOTFS
+sudo pkg image-create --full						\
+     --variant variant.arch=aarch64					\
+     --set-property flush-content-cache-on-success=True			\
+     --publisher $PWD/illumos-gate/packages/aarch64/nightly/repo.redist	\
+     $ROOT
 
-sudo pkg -R $ROOT set-property flush-content-cache-on-success True
+sudo pkg -R $ROOT set-publisher		\
+     -g file:///$PWD/archives/omnios	\
+     -g https://pkg.omnios.org/bloody/braich omnios
 
 # Install everything, to the degree that it is possible, for convenience since
 # there's no pkg(8) in the image
 sudo pkg -R $ROOT install --no-refresh			\
-     osnet-incorporation@latest				\
-     SUNWcsd@latest					\
-     SUNWcs@latest					\
-     osnet-redistributable@latest
+     --reject=osnet					\
+     --reject=ssh-common				\
+     '*@latest'
+
+sudo sed -i '/^last_uuid/d' $ROOT/var/pkg/pkg5.image
+
+sudo sed -i '/PermitRootLogin/s/no/yes/' $ROOT/etc/ssh/sshd_config
+sudo mkdir -p $ROOT/etc/zones
+# Some commands and libraries get upset if they cannot determine the
+# "default zone brand". While we are not shipping zone pages, drop
+# this file into place.
+sudo cp illumos-gate/usr/src/lib/brand/ipkg/zone/SUNWdefault.xml \
+    $ROOT/etc/zones/
 
 # Set up a skeleton /dev
 sudo tar -xf tools/dev.tar -C $ROOT
 sudo touch $ROOT/reconfigure
-
-# Drop in extras, we're sloppy about libraries being in /usr/lib or /lib
-sudo cp sysroot/usr/lib/libz* $ROOT/lib/
-sudo cp sysroot/usr/lib/libz* $ROOT/usr/lib/
-sudo cp sysroot/usr/lib/libxml* $ROOT/lib
-sudo cp sysroot/usr/lib/libxml* $ROOT/usr/lib
-sudo cp sysroot/usr/lib/libidn* $ROOT/lib
-sudo cp sysroot/usr/lib/libidn* $ROOT/usr/lib
-sudo cp sysroot/usr/lib/libssl* $ROOT/lib
-sudo cp sysroot/usr/lib/libssl* $ROOT/usr/lib
-sudo cp sysroot/usr/lib/libcrypto* $ROOT/lib
-sudo cp sysroot/usr/lib/libcrypto* $ROOT/usr/lib
-sudo cp cross/aarch64-unknown-solaris2.11/lib/libstdc++.so* $ROOT/usr/lib
-sudo cp cross/aarch64-unknown-solaris2.11/lib/libgcc_s.so* $ROOT/lib
-sudo cp cross/aarch64-unknown-solaris2.11/lib/libgcc_s.so* $ROOT/usr/lib
-sudo rsync -a sysroot/usr/lib/mps/ $ROOT/usr/lib/mps/
-
-# Drop in xorrisofs both as itself, and as mkisofs, so we can have HSFS
-# boot-archives (which work), rather than UFS (which don't)
-sudo cp sysroot/usr/bin/xorrisofs $ROOT/usr/bin
-sudo cp sysroot/usr/bin/xorrisofs $ROOT/usr/bin/mkisofs
 
 # Without mdb(8) or kmdb(8) kmem debugging is much less useful, and much too
 # slow in the emulator.  This is KMF_DEADBEEF|KMF_REDZONE
 echo "set kmem_flags = 0x6" | sudo tee -a $ROOT/etc/system > /dev/null
 
 # Don't require passwords
-sudo sed -i'' -e 's/PASSREQ=YES/PASSREQ=NO/' $ROOT/etc/default/login
+sudo sed -i 's/PASSREQ=YES/PASSREQ=NO/' $ROOT/etc/default/login
 
 # Have a host name etc, in case dhcp
 echo "braich" | sudo tee -a $ROOT/etc/nodename > /dev/null
+sudo sed -i 's/localhost/localhost braich/' $ROOT/etc/inet/hosts
 
 # Have some swap space
 echo "/dev/zvol/dsk/$POOL/swap	-	-	swap	-	no	-" | \
