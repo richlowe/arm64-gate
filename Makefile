@@ -42,7 +42,9 @@ SYSROOT_PKGS=		\
 	header-idnkit	\
 	header-nspr	\
 	header-nss	\
+	glib2		\
 	idnkit		\
+	libdbus-glib	\
 	libxml2		\
 	mozilla-nss	\
 	nspr		\
