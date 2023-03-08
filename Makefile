@@ -68,7 +68,7 @@ download-perl: $(ARCHIVES)
 	(cd perl-5.36.0 && patch -p1 < ../patches/perl-nanosleep.patch)
 
 download-gcc: $(ARCHIVES)
-	git clone --shallow-since=2019-01-01 -b il-10_3_0-arm64 https://github.com/richlowe/gcc
+	git clone --shallow-since=2019-01-01 -b il-10_4_0-arm64 https://github.com/richlowe/gcc
 
 download-binutils-gdb: $(ARCHIVES)
 	git clone --shallow-since=2019-01-01 -b illumos-arm64 https://github.com/richlowe/binutils-gdb
@@ -163,7 +163,7 @@ $(STAMPS)/boot-gcc-stamp: sgs binutils-gdb sysroot
 	    --with-ld=$(CROSS)/opt/onbld/bin/amd64/ld && \
 	gmake -j $(MAX_JOBS) && \
 	gmake -j $(MAX_JOBS) install && \
-	rm -fr $(CROSS)/lib/gcc/aarch64-unknown-solaris2.11/10.3.0/include-fixed) && \
+	rm -fr $(CROSS)/lib/gcc/aarch64-unknown-solaris2.11/10.4.0/include-fixed) && \
 	touch $@
 
 gcc: $(STAMPS)/gcc-stamp
@@ -197,7 +197,7 @@ $(STAMPS)/gcc-stamp: sgs binutils-gdb boot-gcc sysroot
 	    --with-ld=$(CROSS)/opt/onbld/bin/amd64/ld && \
 	gmake -j $(MAX_JOBS) && \
 	gmake -j $(MAX_JOBS) install && \
-	rm -fr $(CROSS)/lib/gcc/aarch64-unknown-solaris2.11/10.3.0/include-fixed) && \
+	rm -fr $(CROSS)/lib/gcc/aarch64-unknown-solaris2.11/10.4.0/include-fixed) && \
 	touch $@
 
 # XXXARM:
