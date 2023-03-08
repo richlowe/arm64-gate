@@ -47,6 +47,7 @@ SYSROOT_PKGS=		\
 	libdbus-glib	\
 	libxml2		\
 	mozilla-nss	\
+	net-snmp	\
 	nspr		\
 	openssl-3	\
 	xorriso		\
