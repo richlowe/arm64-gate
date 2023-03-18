@@ -51,9 +51,11 @@ sudo pkg image-create --full						\
      --publisher $PWD/illumos-gate/packages/aarch64/nightly/repo.redist	\
      $ROOT
 
-sudo pkg -R $ROOT set-publisher		\
-     -g file:///$PWD/archives/omnios	\
-     -g https://pkg.omnios.org/bloody/braich omnios
+for publisher in omnios extra.omnios; do
+	sudo pkg -R $ROOT set-publisher		\
+	     -g file:///$PWD/archives/omnios	\
+	     -g https://pkg.omnios.org/bloody/braich $publisher
+done
 
 # Install everything, to the degree that it is possible, for convenience since
 # there's no pkg(8) in the image
