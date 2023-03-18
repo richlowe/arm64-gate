@@ -17,6 +17,7 @@ ARCHIVES=$(PWD)/archives
 MAX_JOBS= 12
 
 BLDENV= $(PWD)/illumos-gate/usr/src/tools/scripts/bldenv
+NIGHTLY= $(PWD)/illumos-gate/usr/src/tools/scripts/nightly
 
 # OmniOS puts GMP headers in a weird place, know where to find them.
 GMPINCDIR= /usr/include/gmp
@@ -125,7 +126,7 @@ $(STAMPS)/binutils-gdb-stamp: sysroot
 sgs: $(STAMPS)/sgs-stamp
 $(STAMPS)/sgs-stamp: sysroot
 	(cd illumos-gate && \
-	 $(BLDENV) ../env/aarch64 'cd usr/src/; make -j $(MAX_JOBS) bldtools sgs' && \
+	 $(BLDENV) -T aarch64 ../env/aarch64 'cd usr/src/; make -j $(MAX_JOBS) bldtools sgs' && \
 	 rsync -a usr/src/tools/proto/root_i386-nd/ $(CROSS)/ && \
 	 mkdir -p $(SYSROOT)/usr/include && \
 	 rsync -a proto/root_aarch64/usr/include/ $(SYSROOT)/usr/include/) && \
@@ -277,17 +278,10 @@ $(STAMPS)/dtc-stamp: sysroot
 illumos: $(STAMPS)/illumos-stamp
 $(STAMPS)/illumos-stamp: setup
 	(cd illumos-gate && \
-	 $(BLDENV) ../env/aarch64 'cd usr/src; make -j $(MAX_JOBS) setup' && \
-	 $(BLDENV) ../env/aarch64 'cd usr/src; make -j $(MAX_JOBS) install') && \
+	 $(NIGHTLY) -T aarch64 ../env/aarch64) && \
 	touch $@
 
-illumos-pkgs: $(STAMPS)/illumos-pkgs
-$(STAMPS)/illumos-pkgs:
-	(cd illumos-gate && \
-	 $(BLDENV) ../env/aarch64 'cd usr/src/pkg; make -j $(MAX_JOBS) install') && \
-	touch $@
-
-disk: illumos-pkgs
+disk: illumos
 	ksh tools/build_disk.sh
 
 $(BUILDS):

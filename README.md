@@ -2,10 +2,7 @@
 
 This tree is the bootstrap for illumos on AArch64.  It contains sufficient
 pieces, and build materials, to build a bootable disk that can be used for
-development, of the AArch64 port.
-
-Pieces are missing from here (and matching pieces from illumos), to make this
-easy, if not pleasant, at the current time.
+development of the AArch64 port.
 
 ## Dependencies
 
@@ -31,8 +28,8 @@ To build there are three-ish steps
    versions.  (By default this takes shallow-ish clones of big trees, feel
    free to replace them with full clones).
 1. `make setup` -- Build all the prerequisites to building illumos
-1. `make illumos` -- Build illumos, a bit weirdly right now (we don't use
-   `nightly`).  The environment file is in `env/aarch64` in this directory, and is what gets
+1. `make illumos` -- Build illumos
+   The environment file is in `env/aarch64` in this directory, and is what gets
    used for bootstrapping.
 1. `make disk` -- Build the disk image which you can give to `qemu(1)`
 	This will also ask for your password, so if you just run `make disk` and let

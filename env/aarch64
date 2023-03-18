@@ -111,7 +111,6 @@ export sparc_PRIMARY_CCC=gcc7,$sparc_GNUC_ROOT/bin/g++,gnu
 export sparc_SHADOW_CCS=gcc10,$sparc_GNUC_10_ROOT/bin/gcc,gnu
 export sparc_SHADOW_CCCS=gcc10,$sparc_GNUC_10_ROOT/bin/g++,gnu
 
-
 export i386_PRIMARY_CC=gcc7,$i386_GNUC_ROOT/bin/gcc,gnu
 export i386_PRIMARY_CCC=gcc7,$i386_GNUC_ROOT/bin/g++,gnu
 export i386_SHADOW_CCS=gcc10,$i386_GNUC_10_ROOT/bin/gcc,gnu
@@ -121,25 +120,21 @@ export aarch64_GNUC_ROOT=${CODEMGR_WS}/../cross/
 export aarch64_PRIMARY_CC=gcc10,$aarch64_GNUC_ROOT/bin/aarch64-unknown-solaris2.11-gcc,gnu
 export aarch64_PRIMARY_CCC=gcc10,$aarch64_GNUC_ROOT/bin/aarch64-unknown-solaris2.11-g++,gnu
 
-export AW_aarch64_AS_DIR=${CODEMGR_WS}/../cross/bin
-export AW_aarch64_AS64_DIR=${CODEMGR_WS}/../cross/bin
-export AW_aarch64_AS=${CODEMGR_WS}/../cross/bin/aarch64-unknown-solaris2.11-as
-export AW_aarch64_AS64=${CODEMGR_WS}/../cross/bin/aarch64-unknown-solaris2.11-as
-
 export aarch64_SYSROOT=${CODEMGR_WS}/../sysroot/
 
-export ADJUNCT_PROTO=${aarch64_SYSROOT}
-export GLD=${CODEMGR_WS}/../cross/bin/aarch64-unknown-solaris2.11-ld
-export OBJCOPY=${CODEMGR_WS}/../cross/bin/aarch64-unknown-solaris2.11-objcopy
-export ANSI_CPP=${CODEMGR_WS}/../cross/bin/aarch64-unknown-solaris2.11-cpp
-export MKIMAGE=${CODEMGR_WS}/../build/u-boot/tools/mkimage
-export DTC=${CODEMGR_WS}/../cross/bin/dtc
+if [[ ${MACH} == "aarch64" ]]; then
+	export ADJUNCT_PROTO=${aarch64_SYSROOT}
+	export GLD=${CODEMGR_WS}/../cross/bin/aarch64-unknown-solaris2.11-ld
+	export OBJCOPY=${CODEMGR_WS}/../cross/bin/aarch64-unknown-solaris2.11-objcopy
+	export ANSI_CPP=${CODEMGR_WS}/../cross/bin/aarch64-unknown-solaris2.11-cpp
+	export MKIMAGE=${CODEMGR_WS}/../build/u-boot/tools/mkimage
+	export DTC=${CODEMGR_WS}/../cross/bin/dtc
+fi
 
 # XXXARM: No cross, very broken
 # comment to disable smatch
 #export ENABLE_SMATCH=1
 
-# XXXARM: Better package versions for many many builds a day
 ONNV_BUILDNUM=$(date +%Y%m%d%H%M);		export ONNV_BUILDNUM
 PKGVERS_BRANCH=999999.$(date +%Y.%-m.%-e.%-H.%-M);	export PKGVERS_BRANCH
 
@@ -149,16 +144,20 @@ PKGVERS_BRANCH=999999.$(date +%Y.%-m.%-e.%-H.%-M);	export PKGVERS_BRANCH
 
 # If your distro uses certain versions of Perl, make sure either Makefile.master
 # contains your new defaults OR your .env file sets them.
-# These are how you would override for building on OmniOS r151028, for example.
+# These are how you would override for building on OmniOS r151028, for
+# example.
 export PERL_VERSION=5.36
 export PERL_PKGVERS=-536
-export PERL_MACH=aarch64
-export PERLDIR=${CODEMGR_WS}/../cross/usr/perl5/${PERL_VERSION}
-#export PERL_VARIANT=-thread-multi
+if [[ ${MACH} == "aarch64" ]]; then
+	export PERL_MACH=aarch64
+	export PERLDIR=${CODEMGR_WS}/../cross/usr/perl5/${PERL_VERSION}
+else
+	export PERL_VARIANT=-thread-multi
+fi
 
 # To disable building of the 32-bit or 64-bit perl modules (or both),
 # uncomment these lines:
-#export BUILDPERL32='#'
+export BUILDPERL32='#'
 #export BUILDPERL64='#'
 
 # If your distro uses certain versions of Python, make sure either
@@ -270,9 +269,6 @@ export BUILD_PROJECT=''
 # You should not need to change the next four lines
 export ATLOG="$CODEMGR_WS/log"
 export LOGFILE="$ATLOG/nightly.log"
-export MACH="aarch64"
-export NATIVE_MACH="i386"
-export NATIVE_MACH64="amd64"
 
 #
 #  The following macro points to the closed binaries.  Once illumos has
@@ -290,7 +286,7 @@ export REF_PROTO_LIST="$PARENT_WS/usr/src/proto_list_${MACH}"
 
 export ROOT="$CODEMGR_WS/proto/root_${MACH}"
 export SRC="$CODEMGR_WS/usr/src"
-export MULTI_PROTO="no"
+export MULTI_PROTO="yes"
 
 #
 #	build environment variables, including version info for mcs, motd,
