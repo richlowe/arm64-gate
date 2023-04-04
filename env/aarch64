@@ -138,6 +138,20 @@ fi
 ONNV_BUILDNUM=$(date +%Y%m%d%H%M);		export ONNV_BUILDNUM
 PKGVERS_BRANCH=999999.$(date +%Y.%-m.%-e.%-H.%-M);	export PKGVERS_BRANCH
 
+# Only OmniOS has a fixed pkgdepend right now, and only bloody dated after
+# April 2023
+if [[ ! -f /etc/versions/build.illumos-omnios ]]; then
+	export SUPPRESSPKGDEP=true
+else
+	awk -F= '$1 == "BUILD_ID" { gsub("\\.", " ", $2); print $2 }'  \
+	    /etc/os-release | read major minor year month day;
+
+	if (( ($major < 151045) ||
+	    (($major == 151045) && ((${year}${month} < 202304))) )); then
+		export SUPPRESSPKGDEP=true
+	fi
+fi
+
 # Comment this out to disable support for SMB printing, i.e. if you
 # don't want to bother providing the CUPS headers this needs.
 #export ENABLE_SMB_PRINTING=
