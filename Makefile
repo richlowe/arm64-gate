@@ -208,10 +208,11 @@ $(STAMPS)/gcc-stamp: sgs binutils-gdb boot-gcc sysroot
 # out of tree build is broken for the cross miniperl
 # the cross miniperl build requires gnu tools
 # miniperl is racy (i.e. xconfig.h is not re-generated before the build uses it)
+# configure breaks with certain locale settings
 perl: $(STAMPS)/perl-stamp
 $(STAMPS)/perl-stamp: gcc sysroot
 	(cd perl-5.36.0 && \
-	env PATH="/usr/gnu/bin:$$PATH" \
+	env PATH="/usr/gnu/bin:$$PATH" LC_ALL=C.UTF-8 \
 	./configure \
 	    --target=aarch64-unknown-solaris2.11 \
 	    --host-libs="m" \
