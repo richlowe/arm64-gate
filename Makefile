@@ -101,7 +101,7 @@ $(SETUP_TARGETS): $(SETUP_TARGETS:%=$(BUILDS)/%) $(SYSROOT) $(CROSS) $(BUILDS) $
 
 sysroot: $(SYSROOT)
 $(SYSROOT): FRC
-	[ -f $@/var/pkg/pkg5.image ] || pkg image-create -f --full \
+	[ -f $@/var/pkg/pkg5.image ] || pkg image-create -f --zone \
 	    --publisher $(SYSROOT_PUBLISHER)=$(ARCHIVES)/$(SYSROOT_PUBLISHER) \
 	    --variant variant.arch=aarch64 \
 	    --facet osnet-lock=false \
