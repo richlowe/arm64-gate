@@ -82,39 +82,30 @@ export CODEMGR_WS="`git rev-parse --show-toplevel`"
 
 # OmniOS, etc.
 if [[ -d /opt/gcc-7 ]]; then
-	export sparc_GNUC_ROOT=/opt/gcc-7
-	export i386_GNUC_ROOT=/opt/gcc-7
+	export i386_GNUC_ROOT=/opt/gcc-10
 # OpenIndiana etc.
 elif [[ -d /usr/gcc/7 ]]; then
-	export sparc_GNUC_ROOT=/usr/gcc/7
-	export i386_GNUC_ROOT=/usr/gcc/7
-else
-	print -u2 "I can't work out where your native GCC 7 is!"
-	exit 2
-fi
-
-# OmniOS, etc.
-if [[ -d /opt/gcc-10 ]]; then
-	export sparc_GNUC_10_ROOT=/opt/gcc-10
-	export i386_GNUC_10_ROOT=/opt/gcc-10
-# OpenIndiana etc.
-elif [[ -d /usr/gcc/10 ]]; then
-	export sparc_GNUC_10_ROOT=/usr/gcc/10
-	export i386_GNUC_10_ROOT=/usr/gcc/10
+	export i386_GNUC_ROOT=/usr/gcc/10
 else
 	print -u2 "I can't work out where your native GCC 10 is!"
 	exit 2
 fi
 
-export sparc_PRIMARY_CC=gcc7,$sparc_GNUC_ROOT/bin/gcc,gnu
-export sparc_PRIMARY_CCC=gcc7,$sparc_GNUC_ROOT/bin/g++,gnu
-export sparc_SHADOW_CCS=gcc10,$sparc_GNUC_10_ROOT/bin/gcc,gnu
-export sparc_SHADOW_CCCS=gcc10,$sparc_GNUC_10_ROOT/bin/g++,gnu
+# OmniOS, etc.
+if [[ -d /opt/gcc-7 ]]; then
+	export i386_GNUC_7_ROOT=/opt/gcc-7
+# OpenIndiana etc.
+elif [[ -d /usr/gcc/10 ]]; then
+	export i386_GNUC_7_ROOT=/usr/gcc/7
+else
+	print -u2 "I can't work out where your native GCC 7 is!"
+	exit 2
+fi
 
-export i386_PRIMARY_CC=gcc7,$i386_GNUC_ROOT/bin/gcc,gnu
-export i386_PRIMARY_CCC=gcc7,$i386_GNUC_ROOT/bin/g++,gnu
-export i386_SHADOW_CCS=gcc10,$i386_GNUC_10_ROOT/bin/gcc,gnu
-export i386_SHADOW_CCCS=gcc10,$i386_GNUC_10_ROOT/bin/g++,gnu
+export i386_PRIMARY_CC=gcc10,$i386_GNUC_ROOT/bin/gcc,gnu
+export i386_PRIMARY_CCC=gcc10,$i386_GNUC_ROOT/bin/g++,gnu
+export i386_SHADOW_CCS=gcc7,$i386_GNUC_7_ROOT/bin/gcc,gnu
+export i386_SHADOW_CCCS=gcc7,$i386_GNUC_7_ROOT/bin/g++,gnu
 
 export aarch64_GNUC_ROOT=${CODEMGR_WS}/../cross/
 export aarch64_PRIMARY_CC=gcc10,$aarch64_GNUC_ROOT/bin/aarch64-unknown-solaris2.11-gcc,gnu
