@@ -179,7 +179,9 @@ for v in 3.9 3.10 3.11; do
 done
 
 # Skip Java 11 builds on distributions that don't support it
-if [[ $(readlink -e "/usr/java") == "/usr/jdk/instances/openjdk11.0" ]]; then
+if [[ -d "/usr/jdk/instances/openjdk11.0" ]]; then
+	export JAVA_HOME=/usr/jdk/instances/openjdk11.0
+	export JAVA_ROOT=/usr/jdk/instances/openjdk11.0
 	export BLD_JAVA_11=
 fi
 
