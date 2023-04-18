@@ -81,10 +81,10 @@ export CODEMGR_WS="`git rev-parse --show-toplevel`"
 #
 
 # OmniOS, etc.
-if [[ -d /opt/gcc-7 ]]; then
+if [[ -d /opt/gcc-10 ]]; then
 	export i386_GNUC_ROOT=/opt/gcc-10
 # OpenIndiana etc.
-elif [[ -d /usr/gcc/7 ]]; then
+elif [[ -d /usr/gcc/10 ]]; then
 	export i386_GNUC_ROOT=/usr/gcc/10
 else
 	print -u2 "I can't work out where your native GCC 10 is!"
@@ -95,7 +95,7 @@ fi
 if [[ -d /opt/gcc-7 ]]; then
 	export i386_GNUC_7_ROOT=/opt/gcc-7
 # OpenIndiana etc.
-elif [[ -d /usr/gcc/10 ]]; then
+elif [[ -d /usr/gcc/7 ]]; then
 	export i386_GNUC_7_ROOT=/usr/gcc/7
 else
 	print -u2 "I can't work out where your native GCC 7 is!"
