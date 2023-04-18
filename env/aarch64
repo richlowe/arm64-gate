@@ -123,8 +123,9 @@ if [[ ${MACH} == "aarch64" ]]; then
 fi
 
 # XXXARM: No cross, very broken
-# comment to disable smatch
-#export ENABLE_SMATCH=1
+if [[ ${MACH} == ${NATIVE_MACH} ]]; then
+	export ENABLE_SMATCH=1
+fi
 
 ONNV_BUILDNUM=$(date +%Y%m%d%H%M);		export ONNV_BUILDNUM
 PKGVERS_BRANCH=999999.$(date +%Y.%-m.%-e.%-H.%-M);	export PKGVERS_BRANCH
