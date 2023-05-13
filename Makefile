@@ -305,7 +305,7 @@ clean-illumos:
 	(cd illumos-gate && \
 	 rm -fr packages && \
 	 rm -fr proto && \
-	 $(BLDENV) ../env/aarch64 'cd usr/src; make -j $(MAX_JOBS) clobber')
+	 $(BLDENV) -T aarch64 ../env/aarch64 'cd usr/src; make -j $(MAX_JOBS) clobber')
 
 clean: clean-dtc clean-illumos
 	rm -fr $(SYSROOT) $(BUILDS) $(STAMPS) $(CROSS)
