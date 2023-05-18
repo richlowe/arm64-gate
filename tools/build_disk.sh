@@ -67,12 +67,6 @@ sudo pkg -R $ROOT install --no-refresh			\
 sudo sed -i '/^last_uuid/d' $ROOT/var/pkg/pkg5.image
 
 sudo sed -i '/PermitRootLogin/s/no/yes/' $ROOT/etc/ssh/sshd_config
-sudo mkdir -p $ROOT/etc/zones
-# Some commands and libraries get upset if they cannot determine the
-# "default zone brand". While we are not shipping zone pages, drop
-# this file into place.
-sudo cp illumos-gate/usr/src/lib/brand/ipkg/zone/SUNWdefault.xml \
-    $ROOT/etc/zones/
 
 # Set up a skeleton /dev
 sudo tar -xf tools/dev.tar -C $ROOT
