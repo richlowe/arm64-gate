@@ -54,15 +54,22 @@ sudo pkg image-create --full						\
 for publisher in omnios extra.omnios; do
 	sudo pkg -R $ROOT set-publisher		\
 	     -g file:///$PWD/archives/omnios	\
-	     -g https://pkg.omnios.org/bloody/braich $publisher
+	     -g https://pkg.omnios.org/bloody/braich \
+	     -m https://us-west.mirror.omnios.org/bloody/braich \
+	     $publisher
 done
 
-# Install everything, to the degree that it is possible, for convenience since
-# there's no pkg(8) in the image
+# Install everything, to the degree that it is possible.
 sudo pkg -R $ROOT install --no-refresh			\
      --reject=osnet					\
      --reject=ssh-common				\
      '*@latest'
+
+for publisher in omnios extra.omnios; do
+	sudo pkg -R $root set-publisher \
+	    -G file:///$PWD/archives/omnios \
+	    $publisher
+done
 
 sudo sed -i '/^last_uuid/d' $ROOT/var/pkg/pkg5.image
 
