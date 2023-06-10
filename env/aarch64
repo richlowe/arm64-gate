@@ -107,19 +107,20 @@ export i386_PRIMARY_CCC=gcc10,$i386_GNUC_ROOT/bin/g++,gnu
 export i386_SHADOW_CCS=gcc7,$i386_GNUC_7_ROOT/bin/gcc,gnu
 export i386_SHADOW_CCCS=gcc7,$i386_GNUC_7_ROOT/bin/g++,gnu
 
-export aarch64_GNUC_ROOT=${CODEMGR_WS}/../cross/
+export aarch64_CROSS=${CODEMGR_WS}/../build/cross/
+export aarch64_GNUC_ROOT=${aarch64_CROSS}
 export aarch64_PRIMARY_CC=gcc10,$aarch64_GNUC_ROOT/bin/aarch64-unknown-solaris2.11-gcc,gnu
 export aarch64_PRIMARY_CCC=gcc10,$aarch64_GNUC_ROOT/bin/aarch64-unknown-solaris2.11-g++,gnu
 
-export aarch64_SYSROOT=${CODEMGR_WS}/../sysroot/
+export aarch64_SYSROOT=${CODEMGR_WS}/../build/sysroot/
 
 if [[ ${MACH} == "aarch64" ]]; then
 	export ADJUNCT_PROTO=${aarch64_SYSROOT}
-	export GLD=${CODEMGR_WS}/../cross/bin/aarch64-unknown-solaris2.11-ld
-	export OBJCOPY=${CODEMGR_WS}/../cross/bin/aarch64-unknown-solaris2.11-objcopy
-	export ANSI_CPP=${CODEMGR_WS}/../cross/bin/aarch64-unknown-solaris2.11-cpp
+	export GLD=${aarch64_CROSS}/bin/aarch64-unknown-solaris2.11-ld
+	export OBJCOPY=${aarch64_CROSS}/bin/aarch64-unknown-solaris2.11-objcopy
+	export ANSI_CPP=${aarch64_CROSS}/bin/aarch64-unknown-solaris2.11-cpp
 	export MKIMAGE=${CODEMGR_WS}/../build/u-boot/tools/mkimage
-	export DTC=${CODEMGR_WS}/../cross/bin/dtc
+	export DTC=${aarch64_CROSS}/bin/dtc
 fi
 
 # XXXARM: No cross, very broken
@@ -157,7 +158,7 @@ export PERL_PKGVERS=
 
 if [[ ${MACH} == "aarch64" ]]; then
 	export PERL_MACH=aarch64
-	export PERLDIR=${CODEMGR_WS}/../cross/usr/perl5/${PERL_VERSION}
+	export PERLDIR=${aarch64_CROSS}/usr/perl5/${PERL_VERSION}
 else
 	export PERL_VARIANT=-thread-multi
 fi
