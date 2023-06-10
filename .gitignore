@@ -6,6 +6,7 @@ build/
 src/
 reference/
 stamps/
+out/
 
 **/.make.state
 **/*.o
@@ -15,4 +16,5 @@ stamps/
 
 qemu-setup/illumos-disk.img
 qemu-setup/inetboot.bin
+rpi4-setup/
 

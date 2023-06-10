@@ -2,48 +2,33 @@
 
 set -e
 
-DISK=$PWD/qemu-setup/illumos-disk.img
-POOL=armpool
-MNT=/mnt
-ROOTFS=ROOT/braich
-ROOT=$MNT/$ROOTFS
-DISKSIZE=8g
-
 if [[ ! -f Makefile || ! -d illumos-gate ]]; then
 	print -u2 "$0 should be run from the root of arm64-gate"
 	exit 2
 fi
 
-mkdir -p $PWD/qemu-setup
+if [[ $(zonename) != global ]]; then
+	print -u2 "$0 should be run in the global zone"
+	exit 2
+fi
 
-mkfile $DISKSIZE $DISK
+DATASET="$(zfs list -Ho name / | cut -d/ -f1)/braich_image"
+ROOT=/braich_image
 
-BASE_DEVICE=$(sudo lofiadm -la $DISK)
-RAW_DEVICE=${BASE_DEVICE/dsk/rdsk}
-SLICE=${BASE_DEVICE/p0/s0}
-
-# Taken from OmniOS kayak, note that this leaves s2 and s0 overlapping (which,
-# well...) and so requires zpool create -f, which I don't like.
-sudo fdisk -B $RAW_DEVICE
-# Create slice 0 covering all of the non-reserved space
-OIFS="$IFS"; IFS=" ="
-set -- $(sudo prtvtoc -f $RAW_DEVICE)
-IFS="$OIFS"
-# FREE_START=2048 FREE_SIZE=196608 FREE_COUNT=1 FREE_PART=...
-start=$2; size=$4
-sudo fmthard -d 0:2:01:$start:$size $RAW_DEVICE
-
-sudo zpool create -f -t $POOL -dm $MNT $POOL $SLICE
-sudo zfs create -o canmount=noauto $POOL/ROOT
-sudo zfs create $POOL/$ROOTFS
-sudo zfs create -V 1G $POOL/swap
-sudo zfs create -V 1G $POOL/dump
+zfs list $DATASET >/dev/null 2>&1 && sudo zfs destroy -r $DATASET
+sudo zfs create -o mountpoint=$ROOT $DATASET
+trap 'sudo zfs destroy -r $DATASET' EXIT
 
 # for reasons I can't fathom, synthetic packages don't get published right now
 pkgsend publish -s illumos-gate/packages/aarch64/nightly/repo.redist \
     illumos-gate/usr/src/pkg/packages.aarch64/osnet-incorporation.mog
 pkgsend publish -s illumos-gate/packages/aarch64/nightly/repo.redist \
     illumos-gate/usr/src/pkg/packages.aarch64/osnet-redist.mog
+
+# Setting this flag lets `pkg` know that this is an automatic installation and
+# that the installed packages should not be marked as 'manually installed'
+# in the pkg database.
+export PKG_AUTOINSTALL=1
 
 sudo pkg image-create --full						\
      --variant variant.arch=aarch64					\
@@ -52,10 +37,10 @@ sudo pkg image-create --full						\
      $ROOT
 
 for publisher in omnios extra.omnios; do
-	sudo pkg -R $ROOT set-publisher		\
-	     -g file:///$PWD/archives/omnios	\
-	     -g https://pkg.omnios.org/bloody/braich \
-	     -m https://us-west.mirror.omnios.org/bloody/braich \
+	sudo pkg -R $ROOT set-publisher					\
+	     -g file:///$PWD/archives/omnios				\
+	     -g https://pkg.omnios.org/bloody/braich 			\
+	     -m https://us-west.mirror.omnios.org/bloody/braich 	\
 	     $publisher
 done
 
@@ -66,8 +51,8 @@ sudo pkg -R $ROOT install --no-refresh			\
      '*@latest'
 
 for publisher in omnios extra.omnios; do
-	sudo pkg -R $ROOT set-publisher \
-	    -G file:///$PWD/archives/omnios \
+	sudo pkg -R $ROOT set-publisher			\
+	    -G file:///$PWD/archives/omnios		\
 	    $publisher
 done
 
@@ -140,13 +125,7 @@ rm -f $SVCCFG_REPOSITORY
 # because it can only create ufs/cpio archives, and we can only boot from hsfs
 #sudo illumos-gate/usr/src/cmd/boot/scripts/create_ramdisk -R $ROOT -p aarch64 -f ufs-nocompress
 
-sudo zpool set bootfs=$POOL/$ROOTFS $POOL
-sudo zpool set cachefile="" $POOL
-sudo zfs set mountpoint=none $POOL
-sudo zfs set mountpoint=legacy $POOL/ROOT
-sudo zfs set canmount=noauto $POOL/$ROOTFS
-sudo zfs set mountpoint=/ $POOL/$ROOTFS
-sudo zpool export $POOL
-sudo lofiadm -d $DISK
+sudo zfs snapshot $DATASET@image
+mkdir -p out
+sudo zfs send $DATASET@image | pv > out/illumos.zfs
 
-cp illumos-gate/proto/root_aarch64/platform/QEMU,virt-4.1/inetboot.bin qemu-setup

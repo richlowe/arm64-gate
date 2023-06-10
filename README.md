@@ -18,6 +18,7 @@ development of the AArch64 port.
 - `swig` (pkg:/developer/swig)
 - GnuTLS (pkg:/library/gnutls-3, pkg:/ooce/library/gnutls on omnios)
 - GNU `install` (pkg:/file/gnu-coreutils)
+- Pipe Viewer `pv` (pkg:/shell/pipe-viewer)
 - Hopefully nothing else I forgot
 
 ## Building
