@@ -35,20 +35,25 @@ all:
 	@echo "    download - fetch required sources"
 	@echo "       setup - build all pre-requisites"
 	@echo "     illumos - build illumos"
-	@echo "        disk - build QEMU disk image"
+	@echo "       image - build illumos ZFS image"
+	@echo "   qemu-disk - build QEMU disk image"
+	@echo "   rpi4-disk - build Raspberry Pi 4 disk image"
+	@echo "        disk - build all disk images"
 	@echo
 	@echo "These are usually run one at a time, in the order shown above."
 	@echo "See README.md for more information."
 
-SETUP_TARGETS =		\
-	binutils-gdb 	\
-	boot-gcc	\
-	dtc		\
-	gcc		\
-	perl		\
-	sgs		\
-	sysroot		\
-	u-boot
+SETUP_TARGETS =			\
+	arm-trusted-firmware	\
+	binutils-gdb 		\
+	boot-gcc		\
+	dtc			\
+	gcc			\
+	perl			\
+	sgs			\
+	sysroot			\
+	u-boot			\
+	u-boot-rpi4
 
 SYSROOT_PUBLISHER=	omnios
 SYSROOT_REPO=		https://pkg.omnios.org/bloody/braich
@@ -71,12 +76,14 @@ SYSROOT_PKGS=						\
 	pkg:/system/management/snmp/net-snmp
 
 DOWNLOADS=			\
+	arm-trusted-firmware	\
 	binutils-gdb		\
 	dtc			\
 	gcc			\
 	illumos-gate		\
 	$(SYSROOT_PUBLISHER)	\
 	perl			\
+	rpi-firmware		\
 	u-boot
 
 PERLVER=5.36.0
@@ -106,6 +113,19 @@ download-illumos-gate: FRC
 download-u-boot: $(SRCS)
 	git clone --shallow-since=2019-01-01 -b v2022.10 \
 	    https://github.com/u-boot/u-boot $(SRCS)/u-boot
+	cd $(SRCS)/u-boot && patch -p1 < $(PWD)/patches/u-boot.patch
+
+download-arm-trusted-firmware: $(SRCS)
+	  git clone --depth=1 --branch v2.9.0 \
+	      https://github.com/ARM-software/arm-trusted-firmware \
+	      $(SRCS)/arm-trusted-firmware
+
+RPIFWVER=1.20230405
+download-rpi-firmware: $(ARCHIVES) $(SRCS)
+	wget -O $(ARCHIVES)/firmware-$(RPIFWVER).tar.gz \
+	    https://github.com/raspberrypi/firmware/archive/refs/tags/$(RPIFWVER).tar.gz
+	tar xf $(ARCHIVES)/firmware-$(RPIFWVER).tar.gz \
+	    firmware-$(RPIFWVER)/boot -C $(SRCS)
 
 # XXXARM: We specify what we extract, because the release tarball contains a
 # GNU tar-ism we don't understand.
@@ -197,7 +217,8 @@ $(STAMPS)/boot-gcc-stamp: $(STAMPS)/sgs-stamp $(STAMPS)/binutils-gdb-stamp
 	$(SRCS)/gcc/configure $(COMMON_GCC_OPTS) \
 	    --disable-shared \
 	    --disable-libstdcxx \
-	    --disable-libatomic && \
+	    --disable-libatomic \
+	    --enable-warn-rwx-segments=no && \
 	gmake -j $(MAX_JOBS) && \
 	gmake -j $(MAX_JOBS) install && \
 	rm -fr $(CROSS)/lib/gcc/aarch64-unknown-solaris2.11/10.4.0/include-fixed) && \
@@ -261,18 +282,37 @@ $(STAMPS)/perl-stamp: $(STAMPS)/gcc-stamp
 	cp -f *.h $(CROSS)/usr/perl5/5.36/lib/aarch64-solaris-64/CORE/) && \
 	touch $@
 
+U_BOOT_ARGS =							\
+	HOSTCC="gcc -m64"					\
+	HOSTCFLAGS="-I/opt/ooce/include"			\
+	HOSTLDLIBS="-L/opt/ooce/lib/amd64 -lnsl -lsocket"
+
 u-boot: $(STAMPS)/u-boot-stamp
 $(STAMPS)/u-boot-stamp: $(STAMPS)/sysroot-stamp
 	mkdir -p $(BUILDS)/u-boot && \
 	gmake -C $(SRCS)/u-boot V=1 O=$(BUILDS)/u-boot \
-	    HOSTCC="gcc -m64" \
-	    HOSTCFLAGS+="-I/opt/ooce/include" \
-	    HOSTLDLIBS+="-L/opt/ooce/lib/amd64 -lnsl -lsocket" \
-	    sandbox_defconfig && \
+	    $(U_BOOT_ARGS) sandbox_defconfig && \
 	gmake -C $(SRCS)/u-boot V=1 O=$(BUILDS)/u-boot \
-	    HOSTCC="gcc -m64" \
-	    HOSTCFLAGS+="-I/opt/ooce/include" \
-	    HOSTLDLIBS+="-L/opt/ooce/lib/amd64 -lnsl -lsocket" tools && \
+	    $(U_BOOT_ARGS) tools && \
+	touch $@
+
+u-boot-rpi4: $(STAMPS)/u-boot-rpi4-stamp
+$(STAMPS)/u-boot-rpi4-stamp: $(STAMPS)/u-boot-stamp $(STAMPS)/gcc-stamp
+	gmake -C $(SRCS)/u-boot V=1 O=$(BUILDS)/u-boot \
+	    $(U_BOOT_ARGS) \
+	    CROSS_COMPILE=$(CROSS)/bin/aarch64-unknown-solaris2.11- \
+	    ARCH=arm rpi_4_defconfig u-boot u-boot.bin && \
+	touch $@
+
+arm-trusted-firmware: $(STAMPS)/arm-trusted-firmware-stamp
+$(STAMPS)/arm-trusted-firmware-stamp: $(STAMPS)/gcc-stamp $(STAMPS)/dtc-stamp
+	rsync -a $(SRCS)/arm-trusted-firmware/ \
+	    $(BUILDS)/arm-trusted-firmware/ && \
+	rm -rf $(BUILDS)/arm-trusted-firmware/.git && \
+	CROSS_COMPILE=$(CROSS)/bin/aarch64-unknown-solaris2.11- \
+	DTC=$(CROSS)/bin/dtc \
+	gmake -C $(BUILDS)/arm-trusted-firmware -j $(MAX_JOBS) \
+	    PLAT=rpi4 DEBUG=1 bl31 && \
 	touch $@
 
 dtc: $(STAMPS)/dtc-stamp
@@ -294,8 +334,17 @@ $(STAMPS)/illumos-stamp: $(SETUP_TARGETS:%=$(STAMPS)/%-stamp)
 	 $(NIGHTLY) -T aarch64 ../env/aarch64) && \
 	touch $@
 
-disk: $(STAMPS)/illumos-stamp
-	ksh tools/build_disk.sh
+image: $(PWD)/out/illumos.zfs
+$(PWD)/out/illumos.zfs: $(STAMPS)/illumos-stamp
+	ksh tools/build_image.sh
+
+qemu-disk: $(PWD)/out/illumos.zfs
+	ksh tools/build_qemu.sh
+
+rpi4-disk: $(PWD)/out/illumos.zfs
+	ksh tools/build_rpi4.sh
+
+disk: qemu-disk rpi4-disk
 
 $(BUILDS):
 	mkdir -p $@
