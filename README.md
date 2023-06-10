@@ -35,9 +35,6 @@ To build there are three-ish steps
 	This will also ask for your password, so if you just run `make disk` and let
     dependencies take over, that won't go great.
 
-This is rough around the edges, particularly regarding `Makefile` dependencies
-and spurious rebuilds.  Please do fix this.
-
 Note that `make sysroot` and `make download-omnios` may be run multiple times
 as you work to keep those pieces up-to-date, the latter is especially useful
 as that goes into the disk image we create.

@@ -3,19 +3,9 @@ illumos-gate/
 arm-docs/
 archives/
 build/
+src/
 reference/
 stamps/
-perl-5.36.0/
-perl-cross-1.4/
-dtc-1.6.1/
-
-illumos-gate/
-gcc/
-binutils-gdb/
-u-boot/
-
-cross/
-sysroot/
 
 **/.make.state
 **/*.o
@@ -25,3 +15,4 @@ sysroot/
 
 qemu-setup/illumos-disk.img
 qemu-setup/inetboot.bin
+
