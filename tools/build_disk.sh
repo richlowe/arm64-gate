@@ -66,7 +66,7 @@ sudo pkg -R $ROOT install --no-refresh			\
      '*@latest'
 
 for publisher in omnios extra.omnios; do
-	sudo pkg -R $root set-publisher \
+	sudo pkg -R $ROOT set-publisher \
 	    -G file:///$PWD/archives/omnios \
 	    $publisher
 done
