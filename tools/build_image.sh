@@ -94,6 +94,11 @@ sudo ln -s generic_limited_net.xml $ROOT/etc/svc/profile/generic.xml
 sudo ln -s inetd_generic.xml $ROOT/etc/svc/profile/inetd_services.xml
 sudo ln -s platform_none.xml $ROOT/etc/svc/profile/platform.xml
 
+# Set the default timezone to UTC
+sed -i '/^TZ/c\
+TZ=UTC
+' $ROOT/etc/default/init
+
 # Import all the services ahead of time.  This is a shame, because allowing
 # EMI to happen has found many bugs, but it also takes _forever_
 SVCCFG=illumos-gate/usr/src/tools/proto/root_i386-nd/opt/onbld/bin/i386/svccfg
