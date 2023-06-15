@@ -95,7 +95,7 @@ sudo ln -s inetd_generic.xml $ROOT/etc/svc/profile/inetd_services.xml
 sudo ln -s platform_none.xml $ROOT/etc/svc/profile/platform.xml
 
 # Set the default timezone to UTC
-sed -i '/^TZ/c\
+sudo sed -i '/^TZ/c\
 TZ=UTC
 ' $ROOT/etc/default/init
 
