@@ -45,7 +45,7 @@ all:
 
 SETUP_TARGETS =			\
 	arm-trusted-firmware	\
-	binutils-gdb 		\
+	binutils-gdb		\
 	boot-gcc		\
 	dtc			\
 	gcc			\
@@ -91,10 +91,10 @@ PERLCROSSVER=1.4
 download-perl: $(ARCHIVES) $(SRCS)
 	wget -O $(ARCHIVES)/perl-$(PERLVER).tar.gz \
 	    https://www.cpan.org/src/5.0/perl-$(PERLVER).tar.gz
-	tar -C $(SRCS) -xf archives/perl-$(PERLVER).tar.gz
+	/bin/tar -xf archives/perl-$(PERLVER).tar.gz -C $(SRCS)
 	wget -O $(ARCHIVES)/perl-cross-$(PERLCROSSVER).tar.gz \
 	    https://github.com/arsv/perl-cross/releases/download/$(PERLCROSSVER)/perl-cross-$(PERLCROSSVER).tar.gz
-	tar -C $(SRCS) -xf $(ARCHIVES)/perl-cross-$(PERLCROSSVER).tar.gz
+	/bin/tar -xf $(ARCHIVES)/perl-cross-$(PERLCROSSVER).tar.gz -C $(SRCS)
 	rsync -a $(SRCS)/perl-cross-$(PERLCROSSVER)/* $(SRCS)/perl-$(PERLVER)/
 	cd $(SRCS)/perl-$(PERLVER) && \
 	    patch -p1 < $(PWD)/patches/perl-nanosleep.patch
@@ -124,7 +124,7 @@ RPIFWVER=1.20230405
 download-rpi-firmware: $(ARCHIVES) $(SRCS)
 	wget -O $(ARCHIVES)/firmware-$(RPIFWVER).tar.gz \
 	    https://github.com/raspberrypi/firmware/archive/refs/tags/$(RPIFWVER).tar.gz
-	tar -C $(SRCS) -xf $(ARCHIVES)/firmware-$(RPIFWVER).tar.gz \
+	/bin/tar -xf $(ARCHIVES)/firmware-$(RPIFWVER).tar.gz -C $(SRCS) \
 	    firmware-$(RPIFWVER)/boot
 
 # XXXARM: We specify what we extract, because the release tarball contains a
@@ -133,7 +133,7 @@ DTCVER=1.6.1
 download-dtc: $(ARCHIVES)
 	wget -O $(ARCHIVES)/dtc-$(DTCVER).tar.gz \
 	    https://git.kernel.org/pub/scm/utils/dtc/dtc.git/snapshot/dtc-$(DTCVER).tar.gz
-	tar -C $(SRCS) -xf $(ARCHIVES)/dtc-$(DTCVER).tar.gz dtc-$(DTCVER)
+	/bin/tar -xf $(ARCHIVES)/dtc-$(DTCVER).tar.gz -C $(SRCS) dtc-$(DTCVER)
 
 $(ARCHIVES)/$(SYSROOT_PUBLISHER): $(ARCHIVES)
 	pkgrepo -s $@ create
@@ -183,7 +183,7 @@ $(STAMPS)/sgs-stamp: $(STAMPS)/sysroot-stamp
 	touch $@
 
 # Note lp64 only, the default is multilib
-COMMON_GCC_OPTS= 						\
+COMMON_GCC_OPTS=						\
 	--with-gmp-include=$(GMPINCDIR)				\
 	--target=aarch64-unknown-solaris2.11			\
 	--with-abi=lp64						\
