@@ -346,6 +346,9 @@ rpi4-disk: $(PWD)/out/illumos.zfs
 
 disk: qemu-disk rpi4-disk
 
+nfs: illumos
+        ksh tools/build_nfs.sh
+
 $(BUILDS):
 	mkdir -p $@
 $(STAMPS):
