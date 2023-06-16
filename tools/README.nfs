@@ -1,0 +1,168 @@
+# Illumos rpi4 NFS server setup
+# based on n-hys network boot and rich.lowe build_disk utility
+# marek.mintal@phaetech.com 2023
+#
+#
+#
+
+Preapre NFS boot space
+----------------------
+
+# NFS boot space is a network boot disk for rpi. The files/packaes are identical with a disk setup provided by "make disk".
+# with some rpi4 and network related stuff.
+
+make nfs
+
+1, The NFS direcorty arm-gate/nfs is prepared and data are owned by root, sudo root password is required
+2, All installation using night build is done as for standard disk setup "make disk"
+3, Datetime correct setup is configured as legaxy service S10rdate - required to continue with https access for ZFS install stages 
+4, Console driver is binded to rpi serial console instead of qemu pl101
+5, SD card driver binded
+...
+
+# within arm-gate directory run:
+ make nfs
+
+Time server preparation
+-----------------------
+pkg install service/network/legacy
+svcadm enable time:dgram
+svcadm enable time:stream
+
+
+NFS Server setup on solaris omnios
+----------------------------------
+
+# Prepare the share, basic example, the setup can vary on the server configuration.
+# The directory is in RW mode and root priviledges required yet.
+
+sharemgr share -F nfs  -o anon=0,sec=none,rw /home/minty/solaris1/arm64-gate/nfs
+sharemgr enable default
+
+DHCP Server preparation example
+-------------------------------
+
+# Note the MAC address entry and valid IPs for server, client and network.
+
+ /etc/inet/dhcpd4.conf
+
+option space SUNW;
+option SUNW.root-mount-options code 1 = text;
+option SUNW.root-server-ip-address code 2 = ip-address;
+option SUNW.root-server-hostname code 3 = text;
+option SUNW.root-path-name code 4 = text;
+option SUNW.swap-server-ip-address code 5 = ip-address;
+option SUNW.swap-file-path code 6 = text;
+option SUNW.boot-file-path code 7 = text;
+option SUNW.posix-timezone-string code 8 = text;
+option SUNW.boot-read-size code 9 = unsigned integer 16;
+option SUNW.install-server-ip-address code 10 = ip-address;
+option SUNW.install-server-hostname code 11 = text;
+option SUNW.install-path code 12 = text;
+option SUNW.sysid-config-file-server code 13 = text;
+option SUNW.JumpStart-server code 14 = text;
+option SUNW.terminal-name code 15 = text;
+option SUNW.standalone-boot-uri code 16 = text;
+option SUNW.standalone-boot-http-proxy code 17 = text;
+
+class "solaris" {
+    match if substring (hardware, 1, 3) = d8:3a:dd;
+}
+
+subnet 192.168.1.0 netmask 255.255.255.0 {
+    option subnet-mask 255.255.255.0;
+    option broadcast-address 192.168.1.255;
+    option routers 192.168.1.254;
+    option domain-name-servers 192.168.1.254;
+    option domain-name "house.local";
+    default-lease-time 14400;
+    max-lease-time 172800;
+
+    vendor-option-space SUNW;
+    option SUNW.root-mount-options "rsize=32768";
+    option SUNW.root-server-hostname "omnios";
+    option SUNW.root-server-ip-address 192.168.1.6;
+    next-server 192.168.1.6;
+
+    group { # id="Solaris-ARMv8"
+        option SUNW.root-path-name "/home/minty/solaris1/arm64-gate/nfs";
+        host rpi4 {
+            option vendor-class-identifier "RaspberryPi,4";
+            option host-name "rpi4";
+            filename "/platform/RaspberryPi,4/inetboot";
+            fixed-address 192.168.1.92;
+            hardware ethernet d8:3a:dd:02:b2:e6;
+        }
+    }
+
+}
+
+# to run dhcp server in debug mode:
+root# dhcpd -d -cf /etc/inet/dhcpd4.conf
+
+
+TFTP server
+----------
+# Prepare the /tftp directory - link (example). The u-boot will try to download the file specified as "filename" in dhcpd.conf above.
+
+/tftpboot -> /home/minty/solaris1/arm64-gate/nfs
+
+# Enable the service:
+ pkg install tftp
+ svcadm enable tftp
+
+online         Jun_08   svc:/network/tftp/udp6:default
+
+Rpi4 boot process:
+------------------
+
+# Load the inetboot
+
+U-Boot> bootp
+BOOTP broadcast 1
+DHCP client bound to address 192.168.1.92 (1 ms)
+Using ethernet@7d580000 device
+TFTP from server 192.168.1.6; our IP address is 192.168.1.92
+Filename '/platform/RaspberryPi,4/inetboot'.
+Load address: 0x1000000
+Loading: ##################################################  651.2 KiB
+         2.1 MiB/s
+done
+Bytes transferred = 666872 (a2cf8 hex)
+
+
+# Set the boot device:
+ setenv bootargs "-D /scb/ethernet@7d580000"
+
+# Boot the kernel from memory 0x1000000
+ U-Boot> bootm 0x1000000 - $fdt_addr
+
+## Booting kernel from Legacy Image at 01000000 ...
+   Image Name:   illumos
+   Image Type:   AArch64 Linux Kernel Image (uncompressed)
+   Data Size:    666808 Bytes = 651.2 KiB
+   Load Address: 00080000
+   Entry Point:  00080000
+   Verifying Checksum ... OK
+## Flattened Device Tree blob at 2eff2d00
+   Booting using the fdt blob at 0x2eff2d00
+Working FDT set to 2eff2d00
+   Loading Kernel Image
+   Using Device Tree in place at 000000002eff2d00, end 000000002f0030ca
+Working FDT set to 2eff2d00
+
+Starting kernel ...
+
+phys memory add 0000000000000000 - 000000003e5fffff
+phys memory add 0000000040000000 - 00000000fbffffff
+phys memory add 0000000100000000 - 000000017fffffff
+
+<skip>
+
+[ network/routing-setup:default starting (Initial routing-related configuration.) ]
+[ milestone/sysconfig:default starting (Basic system configuration milestone) ]
+[ system/filesystem/local:default starting (local file system mounts) ]
+[ system/utmp:default starting (utmpx monitoring) ]
+[ system/console-login:default starting (Console login) ]
+
+rpi4 console login: 
