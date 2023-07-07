@@ -30,25 +30,43 @@ pkgsend publish -s illumos-gate/packages/aarch64/nightly/repo.redist \
 # in the pkg database.
 export PKG_AUTOINSTALL=1
 
+ILLUMOS_REPO=$PWD/illumos-gate/packages/aarch64/nightly/repo.redist
+
 sudo pkg image-create --full						\
      --variant variant.arch=aarch64					\
      --set-property flush-content-cache-on-success=True			\
-     --publisher $PWD/illumos-gate/packages/aarch64/nightly/repo.redist	\
+     --publisher $ILLUMOS_REPO						\
      $ROOT
 
 for publisher in omnios extra.omnios; do
 	sudo pkg -R $ROOT set-publisher					\
 	     -g file:///$PWD/archives/omnios				\
-	     -g https://pkg.omnios.org/bloody/braich 			\
-	     -m https://us-west.mirror.omnios.org/bloody/braich 	\
+	     -g https://pkg.omnios.org/bloody/braich			\
+	     -m https://us-west.mirror.omnios.org/bloody/braich		\
 	     $publisher
 done
 
-# Install everything, to the degree that it is possible.
-sudo pkg -R $ROOT install --no-refresh			\
-     --reject=osnet					\
-     --reject=ssh-common				\
-     '*@latest'
+# We install entire, and also the optional packages listed in entire. These are
+# ones that we'd like in the initial image but can be removed by the user if
+# desired.
+# network/telnet is broken out here because unfortunately the unqualified name
+# is ambiguous (it also matches service/network/telnet). We can't just use
+# qualified names in general because the pkg://omnios/ packages conflict with
+# the newer versions in pkg://on-nightly/.
+pkglist=(
+	entire
+	"pkg://on-nightly/*"
+	developer/build-essential
+	$(pkg -R $ROOT contents -rH -a type=optional -o fmri entire | \
+	    cut -d/ -f4- | egrep -v 'telnet')
+	pkg://on-nightly/network/telnet
+)
+sudo pkg -R $ROOT install --reject ssh-common ${pkglist[*]}
+
+sudo pkg -R $ROOT set-publisher				\
+    --non-sticky					\
+    -G file:///$ILLUMOS_REPO				\
+    on-nightly
 
 for publisher in omnios extra.omnios; do
 	sudo pkg -R $ROOT set-publisher			\
