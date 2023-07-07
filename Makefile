@@ -45,6 +45,7 @@ all:
 
 SETUP_TARGETS =			\
 	arm-trusted-firmware	\
+	barn			\
 	binutils-gdb		\
 	boot-gcc		\
 	dtc			\
@@ -77,6 +78,7 @@ SYSROOT_PKGS=						\
 
 DOWNLOADS=			\
 	arm-trusted-firmware	\
+	barn			\
 	binutils-gdb		\
 	dtc			\
 	gcc			\
@@ -119,6 +121,10 @@ download-arm-trusted-firmware: $(SRCS)
 	  git clone --depth=1 --branch v2.9.0 \
 	      https://github.com/ARM-software/arm-trusted-firmware \
 	      $(SRCS)/arm-trusted-firmware
+
+download-barn: $(SRCS)
+	curl -fLo $(SRCS)/barn.c \
+	    https://github.com/omniosorg/kayak/raw/master/src/barn.c
 
 RPIFWVER=1.20230405
 download-rpi-firmware: $(ARCHIVES) $(SRCS)
@@ -313,6 +319,11 @@ $(STAMPS)/arm-trusted-firmware-stamp: $(STAMPS)/gcc-stamp $(STAMPS)/dtc-stamp
 	DTC=$(CROSS)/bin/dtc \
 	gmake -C $(BUILDS)/arm-trusted-firmware -j $(MAX_JOBS) \
 	    PLAT=rpi4 DEBUG=1 bl31 && \
+	touch $@
+
+barn: $(STAMPS)/barn-stamp
+$(STAMPS)/barn-stamp: $(SRCS)/barn.c
+	gcc -m64 -o $(BUILDS)/barn $(SRCS)/barn.c -lnvpair && \
 	touch $@
 
 dtc: $(STAMPS)/dtc-stamp
