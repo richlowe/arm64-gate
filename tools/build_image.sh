@@ -14,6 +14,7 @@ fi
 
 DATASET="$(zfs list -Ho name / | cut -d/ -f1)/braich_image"
 ROOT=/braich_image
+WORKDIR=$PWD
 
 zfs list $DATASET >/dev/null 2>&1 && sudo zfs destroy -r $DATASET
 sudo zfs create -o mountpoint=$ROOT $DATASET
@@ -137,16 +138,41 @@ sudo chown root:sys $ROOT/etc/svc/repository.db
 sudo chmod 0600 $ROOT/etc/svc/repository.db
 rm -f $SVCCFG_REPOSITORY
 
-# Create a boot_archive manually, because tooling
-(cd $ROOT;
- sudo mkisofs -quiet -graft-points -dlrDJN -relaxed-filenames -o ./platform/armv8/boot_archive \
-      $(boot/solaris/bin/extract_boot_filelist -R $ROOT -p aarch64 boot/solaris/filelist.ramdisk | \
-		(while read file; do [[ -e $file ]] && echo $file; done) | \
-		awk '{printf("/%s=./%s\n", $1, $1);}'))
-
 # If this worked it would be lovely, but it doesn't yet
 # because it can only create ufs/cpio archives, and we can only boot from hsfs
 #sudo illumos-gate/usr/src/cmd/boot/scripts/create_ramdisk -R $ROOT -p aarch64 -f ufs-nocompress
+
+# However, the native tools do not yet know how to build a boot archive for
+# aarch64. Create a boot archive manually, faking up enough so that the system
+# is happy with the boot archive on first boot.
+(
+	cd $ROOT
+
+	typeset filelist=$(mktemp)
+
+	./boot/solaris/bin/extract_boot_filelist \
+	    -R $ROOT -p aarch64 boot/solaris/filelist.ramdisk | \
+	    while read file; do
+		[ -e "$file" ] && find "$file" -type f
+	done | awk '{printf("/%s=./%s\n", $1, $1)}' > $filelist
+
+	sudo mkisofs \
+	    -quiet \
+	    -graft-points \
+	    -dlrDJN \
+	    -relaxed-filenames \
+	    -o ./platform/armv8/boot_archive \
+	    $(cat $filelist)
+
+	sudo $WORKDIR/build/barn -R $ROOT -w $filelist
+
+	/usr/bin/sed -i 's/=\./=/' $filelist
+	sudo cp $filelist ./platform/armv8/archive_cache
+	sudo chmod 644 ./platform/armv8/archive_cache
+	rm -f $filelist
+
+	sudo touch ./boot/solaris/timestamp.cache
+)
 
 sudo zfs snapshot $DATASET@image
 mkdir -p out
