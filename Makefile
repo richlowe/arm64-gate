@@ -57,6 +57,7 @@ SETUP_TARGETS =			\
 	u-boot-rpi4
 
 SYSROOT_PUBLISHER=	omnios
+EXTRA_PUBLISHERS=	extra.omnios
 SYSROOT_REPO=		https://pkg.omnios.org/bloody/braich
 SYSROOT_PKGS=						\
 	pkg:/library/glib2				\
@@ -138,14 +139,19 @@ download-dtc: $(ARCHIVES)
 	    https://git.kernel.org/pub/scm/utils/dtc/dtc.git/snapshot/dtc-$(DTCVER).tar.gz
 	/bin/tar -xf $(ARCHIVES)/dtc-$(DTCVER).tar.gz -C $(SRCS) dtc-$(DTCVER)
 
+# there are publishers we set for the images but we don't download any packages
+# from these to the local package cache (since we don't need it for the build and neither
+# seed anything from it to the image);
+# pkg(7) gets upset if one of the package repositories does not know about a publisher,
+# so we set additional publishers to the cache package repository
 $(ARCHIVES)/$(SYSROOT_PUBLISHER): $(ARCHIVES)
 	pkgrepo -s $@ create
+	pkgrepo -s $@ add-publisher $(EXTRA_PUBLISHERS)
 
 download-$(SYSROOT_PUBLISHER): $(ARCHIVES)/$(SYSROOT_PUBLISHER)
-	pkgrecv -s $(SYSROOT_REPO) -m latest -d $^ '*@latest'
+	pkgrecv -s $(SYSROOT_REPO) -r -m latest -d $^ entire build-essential $(SYSROOT_PKGS)
 
 download: $(DOWNLOADS:%=download-%)
-
 
 setup: $(SETUP_TARGETS:%=$(STAMPS)/%-stamp)
 $(SETUP_TARGETS:%=$(STAMPS)/%-stamp): $(BUILDS) $(STAMPS)
