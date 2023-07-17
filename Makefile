@@ -61,10 +61,8 @@ SYSROOT_REPO=		https://pkg.omnios.org/bloody/braich
 SYSROOT_PKGS=						\
 	pkg:/library/glib2				\
 	pkg:/library/idnkit				\
-	pkg:/library/idnkit/header-idnkit		\
 	pkg:/library/libxml2				\
 	pkg:/library/nspr				\
-	pkg:/library/nspr/header-nspr			\
 	pkg:/library/security/openssl-3			\
 	pkg:/library/zlib				\
 	pkg:/media/xorriso				\
@@ -73,7 +71,6 @@ SYSROOT_PKGS=						\
 	pkg:/system/library/dbus			\
 	pkg:/system/library/libdbus-glib		\
 	pkg:/system/library/mozilla-nss			\
-	pkg:/system/library/mozilla-nss/header-nss	\
 	pkg:/system/management/snmp/net-snmp
 
 DOWNLOADS=			\
