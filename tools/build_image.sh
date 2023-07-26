@@ -15,6 +15,7 @@ fi
 DATASET="$(zfs list -Ho name / | cut -d/ -f1)/braich_image"
 ROOT=/braich_image
 WORKDIR=$PWD
+POOL=armpool # We need to know this to configure swap and dump
 
 zfs list $DATASET >/dev/null 2>&1 && sudo zfs destroy -r $DATASET
 sudo zfs create -o mountpoint=$ROOT $DATASET
