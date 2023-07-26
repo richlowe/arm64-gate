@@ -1,7 +1,7 @@
 #!/bin/ksh93
 
 DISK=$PWD/rpi4-setup/illumos-disk.img
-POOL=armpool
+POOL=armpool			# Must match build_image
 MNT=/mnt
 ROOTFS=ROOT/braich
 ROOT=$MNT/$ROOTFS

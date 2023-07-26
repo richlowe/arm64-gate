@@ -3,7 +3,7 @@
 set -e
 
 DISK=$PWD/qemu-setup/illumos-disk.img
-POOL=armpool
+POOL=armpool			# Must match build_image
 MNT=/mnt
 ROOTFS=ROOT/braich
 ROOT=$MNT/$ROOTFS
