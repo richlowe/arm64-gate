@@ -9,17 +9,44 @@ development of the AArch64 port.
 - An illumos system
 - A compilation environment, headers, compiler, etc.
   (You will need both GCC 7, GCC 10, and their dependencies and build
-  dependencies to include at least GMP, MPC, and MPFR).
-- `sudo` (pkg:/security/sudo)
-- `mkisofs` (pkg:/media/cdrtools)
-- `rsync` (pkg:/network/rsync)
-- OpenSSL 1.1 or compatible (pkg:/library/security/openssl-11)
-  (on OpenIndiana this may require `sudo pkg set-mediator -V 1.1 openssl`)
-- `swig` (pkg:/developer/swig)
-- GnuTLS (pkg:/library/gnutls-3, pkg:/ooce/library/gnutls on omnios)
-- GNU `install` (pkg:/file/gnu-coreutils)
-- Pipe Viewer `pv` (pkg:/shell/pipe-viewer)
-- Hopefully nothing else I forgot
+  dependencies to include at least GMP, MPC, and MPFR):
+  ```sh
+  # Run this in OmniOS:
+  sudo pkg install \
+	pkg:/developer/gcc7 \
+	pkg:/developer/gcc10 \
+	pkg:/developer/pkg-config \
+	pkg:/ooce/library/gnutls \
+	pkg:/ooce/text/texinfo
+
+  # Run this in OpenIndiana:
+  sudo pkg install \
+	pkg:/developer/gcc-7 \
+	pkg:/developer/gcc-10 \
+	pkg:/developer/build/pkg-config \
+	pkg:/library/gnutls-3 \
+	pkg:/text/texinfo
+
+  # For OpenIndiana, this may be necessary before installing OpenSSL:
+  sudo pkg set-mediator -V 1.1 openssl
+
+  # Run this in OmniOS or OpenIndiana:
+  sudo pkg install \
+	pkg:/developer/astdev \
+	pkg:/developer/illumos-closed \
+	pkg:/developer/swig \
+	pkg:/developer/build/gnu-make \
+	pkg:/developer/build/onbld \
+	pkg:/developer/java/openjdk8 \
+	pkg:/developer/parser/bison \
+	pkg:/file/gnu-coreutils \
+	pkg:/library/perl-5/xml-parser \
+	pkg:/library/security/openssl-11 \
+	pkg:/media/cdrtools \
+	pkg:/security/sudo \
+	pkg:/shell/pipe-viewer \
+	pkg:/system/zones/internal
+  ```
 
 ## Building
 
