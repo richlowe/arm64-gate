@@ -63,7 +63,7 @@ pkglist=(
 	    cut -d/ -f4- | egrep -v 'telnet')
 	pkg://on-nightly/network/telnet
 )
-sudo pkg -R $ROOT install --reject ssh-common ${pkglist[*]}
+sudo pkg -R $ROOT install --reject ssh-common system/rsyslog ${pkglist[*]}
 
 sudo pkg -R $ROOT set-publisher				\
     --non-sticky					\
