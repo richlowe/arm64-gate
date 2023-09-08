@@ -60,10 +60,11 @@ pkglist=(
 	"pkg://on-nightly/*"
 	developer/build-essential
 	$(pkg -R $ROOT contents -rH -a type=optional -o fmri entire | \
-	    cut -d/ -f4- | egrep -v 'telnet')
+	    cut -d/ -f4- | egrep -v '(telnet|rsyslog)')
 	pkg://on-nightly/network/telnet
 )
-sudo pkg -R $ROOT install --reject ssh-common system/rsyslog ${pkglist[*]}
+sudo pkg -R $ROOT install --reject ssh-common --reject system/rsyslog \
+     ${pkglist[*]}
 
 sudo pkg -R $ROOT set-publisher				\
     --non-sticky					\
