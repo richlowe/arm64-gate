@@ -2,9 +2,8 @@
 
 DISK=$PWD/rpi4-setup/illumos-disk.img
 POOL=armpool			# Must match build_image
-MNT=/mnt
+MNT=/tmp/${POOL}.$$
 ROOTFS=ROOT/braich
-ROOT=$MNT/$ROOTFS
 DISKSIZE=4g
 
 USAGE="[+NAME?build_rpi4 --- create a disk image for a Raspberry Pi 4]"
@@ -93,7 +92,7 @@ if ((EFI)); then
 	# to get it to create an initial FAT partition for us.
 	sudo zpool create \
 	    -B -o bootsize=256M \
-	    -t $POOL -m $MNT $POOL ${BLK_DEVICE%p0}
+	    -t $POOL -R $MNT $POOL ${BLK_DEVICE%p0}
 
 	FAT_RAW=${RAW_DEVICE/p0/s0}
 	FAT_BLK=${BLK_DEVICE/p0/s0}
@@ -150,7 +149,7 @@ else
 	start=$2; size=$4
 	sudo fmthard -d 0:2:01:$start:$size $RAW_DEVICE
 
-	sudo zpool create -f -t $POOL -m $MNT $POOL $SLICE ${BLK_DEVICE/p0/s0}
+	sudo zpool create -f -t $POOL -R $MNT $POOL $SLICE ${BLK_DEVICE/p0/s0}
 
 	FAT_RAW=$RAW_DEVICE:c
 	FAT_BLK=$BLK_DEVICE:c
@@ -158,18 +157,25 @@ fi
 
 print "Populating root"
 
-sudo zfs create -o canmount=noauto -o mountpoint=legacy $POOL/ROOT
+sudo zfs create $POOL/ROOT
 
 pv < out/illumos.zfs | sudo zfs receive -u $POOL/$ROOTFS
+sudo zfs set canmount=noauto $POOL/ROOT
 sudo zfs set canmount=noauto $POOL/$ROOTFS
 sudo zfs set mountpoint=legacy $POOL/$ROOTFS
 
 sudo zfs create -sV 1G $POOL/swap
 sudo zfs create -V 1G $POOL/dump
 
+# We need a boot menu, for beadm(8) etc. to work.
+sudo mkdir -p $MNT/$POOL/boot
+cat <<EOF | sudo tee -a $MNT/$POOL/boot/menu.lst >/dev/null
+title braich
+bootfs $POOL/$ROOTFS
+EOF
+
 sudo zpool set bootfs=$POOL/$ROOTFS $POOL
 sudo zpool set cachefile="" $POOL
-sudo zfs set mountpoint=none $POOL
 sudo zpool export $POOL
 
 print "Populating boot"
@@ -181,4 +187,4 @@ sudo mount -F pcfs $FAT_BLK $MNT
 sudo umount $MNT
 
 sudo lofiadm -d $DISK
-
+sudo rmdir $MNT

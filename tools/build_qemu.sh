@@ -4,9 +4,8 @@ set -e
 
 DISK=$PWD/qemu-setup/illumos-disk.img
 POOL=armpool			# Must match build_image
-MNT=/mnt
+MNT=/tmp/${POOL}.$$
 ROOTFS=ROOT/braich
-ROOT=$MNT/$ROOTFS
 DISKSIZE=8g
 
 USAGE="[+NAME?build_qemu --- create a disk image for booting under qemu]"
@@ -46,7 +45,7 @@ RAW_DEVICE=${BLK_DEVICE/dsk/rdsk}
 
 if ((EFI)); then
 	print "Building an EFI (GPT-partitioned) image"
-	sudo zpool create -t $POOL -m $MNT $POOL ${BLK_DEVICE%p0}
+	sudo zpool create -t $POOL -R $MNT $POOL ${BLK_DEVICE%p0}
 else
 	print "Building an MBR-partitioned image"
 	# Taken from OmniOS kayak, note that this leaves s2 and s0 overlapping
@@ -60,26 +59,34 @@ else
 	start=$2; size=$4
 	sudo fmthard -d 0:2:01:$start:$size $RAW_DEVICE
 
-	sudo zpool create -f -t $POOL -m $MNT $POOL ${BLK_DEVICE/p0/s0}
+	sudo zpool create -f -t $POOL -R $MNT $POOL ${BLK_DEVICE/p0/s0}
 fi
 
 print "Populating root"
 
-sudo zfs create -o canmount=noauto -o mountpoint=legacy $POOL/ROOT
+sudo zfs create $POOL/ROOT
 
 pv < out/illumos.zfs | sudo zfs receive -u $POOL/$ROOTFS
+sudo zfs set canmount=noauto $POOL/ROOT
 sudo zfs set canmount=noauto $POOL/$ROOTFS
 sudo zfs set mountpoint=legacy $POOL/$ROOTFS
 
 sudo zfs create -sV 1G $POOL/swap
 sudo zfs create -V 1G $POOL/dump
 
+# We need a boot menu, for beadm(8) etc. to work.
+sudo mkdir -p $MNT/$POOL/boot
+cat <<EOF | sudo tee -a $MNT/$POOL/boot/menu.lst >/dev/null
+title braich
+bootfs $POOL/$ROOTFS
+EOF
+
 sudo zpool set bootfs=$POOL/$ROOTFS $POOL
 sudo zpool set cachefile="" $POOL
-sudo zfs set mountpoint=none $POOL
 sudo zpool export $POOL
 
 sudo lofiadm -d $DISK
 cp illumos-gate/proto/root_aarch64/platform/QEMU,virt-4.1/inetboot.bin \
-    qemu-setup
+   qemu-setup
+sudo rmdir $MNT
 
