@@ -94,7 +94,7 @@ sudo sed -i 's/PASSREQ=YES/PASSREQ=NO/' $ROOT/etc/default/login
 
 # Have a host name etc, in case dhcp
 echo "braich" | sudo tee -a $ROOT/etc/nodename > /dev/null
-sudo sed -i 's/localhost/localhost braich/' $ROOT/etc/inet/hosts
+sudo sed -i 's/localhost/braich.dev braich localhost/' $ROOT/etc/inet/hosts
 
 # Have some swap space
 echo "/dev/zvol/dsk/$POOL/swap	-	-	swap	-	no	-" | \
