@@ -86,8 +86,10 @@ DOWNLOADS=			\
 	rpi-firmware		\
 	u-boot
 
-PERLVER=5.36.0
-PERLCROSSVER=1.4
+PERLVER=5.38.0
+PERLCROSSVER=1.5
+PERLMAJVER.cmd= echo $(PERLVER) | cut -d. -f1,2
+PERLMAJVER= $(PERLMAJVER.cmd:sh)
 download-perl: $(ARCHIVES) $(SRCS)
 	wget -O $(ARCHIVES)/perl-$(PERLVER).tar.gz \
 	    https://www.cpan.org/src/5.0/perl-$(PERLVER).tar.gz
@@ -277,18 +279,19 @@ $(STAMPS)/perl-stamp: $(STAMPS)/gcc-stamp
 	    -Dreadelf=$(CROSS)/bin/aarch64-unknown-solaris2.11-readelf \
 	    -Dobjdump=$(CROSS)/bin/aarch64-unknown-solaris2.11-objdump \
 	    -Doptimize="-O3" \
-	    -Dprefix=$(CROSS)/usr/perl5/5.36 \
+	    -Dprefix=$(CROSS)/usr/perl5/$(PERLMAJVER) \
 	    -Ulocincpth= \
 	    -Uloclibpth= && \
+	sed -i "s/^d_setenv=.*/d_setenv='undef'/g" xconfig.sh && \
 	sed -i "s/^d_unsetenv=.*/d_unsetenv='undef'/g" xconfig.sh && \
 	gmake miniperl && \
 	gmake -j $(MAX_JOBS) modules && \
-	mkdir -p $(CROSS)/usr/perl5/5.36/bin && \
-	mkdir -p $(CROSS)/usr/perl5/5.36/lib/aarch64-solaris-64/CORE && \
-	cp -f miniperl $(CROSS)/usr/perl5/5.36/bin/perl && \
-	rsync -a lib/* $(CROSS)/usr/perl5/5.36/lib/aarch64-solaris-64/ && \
-	ln -sf ./aarch64-solaris-64/ExtUtils $(CROSS)/usr/perl5/5.36/lib/ExtUtils && \
-	cp -f *.h $(CROSS)/usr/perl5/5.36/lib/aarch64-solaris-64/CORE/) && \
+	mkdir -p $(CROSS)/usr/perl5/$(PERLMAJVER)/bin && \
+	mkdir -p $(CROSS)/usr/perl5/$(PERLMAJVER)/lib/aarch64-solaris-64/CORE && \
+	cp -f miniperl $(CROSS)/usr/perl5/$(PERLMAJVER)/bin/perl && \
+	rsync -a lib/* $(CROSS)/usr/perl5/$(PERLMAJVER)/lib/aarch64-solaris-64/ && \
+	ln -sf ./aarch64-solaris-64/ExtUtils $(CROSS)/usr/perl5/$(PERLMAJVER)/lib/ExtUtils && \
+	cp -f *.h $(CROSS)/usr/perl5/$(PERLMAJVER)/lib/aarch64-solaris-64/CORE/) && \
 	touch $@
 
 U_BOOT_ARGS =							\

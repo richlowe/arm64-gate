@@ -153,7 +153,7 @@ fi
 # contains your new defaults OR your .env file sets them.
 # These are how you would override for building on OmniOS r151028, for
 # example.
-export PERL_VERSION=5.36
+export PERL_VERSION=5.38
 export PERL_PKGVERS=
 
 if [[ ${MACH} == "aarch64" ]]; then
