@@ -26,6 +26,7 @@ development of the AArch64 port.
 	pkg:/developer/build/pkg-config \
 	pkg:/library/gnutls-3 \
   pkg:/network/rsync \
+  pkg:/library/mpc \
 	pkg:/text/texinfo
 
   # For OpenIndiana, this may be necessary before installing OpenSSL:
