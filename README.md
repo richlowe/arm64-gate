@@ -40,9 +40,11 @@ development of the AArch64 port.
 	pkg:/developer/java/openjdk8 \
 	pkg:/developer/parser/bison \
 	pkg:/file/gnu-coreutils \
+	pkg:/library/mpc \
 	pkg:/library/perl-5/xml-parser \
 	pkg:/library/security/openssl-11 \
 	pkg:/media/cdrtools \
+	pkg:/network/rsync \
 	pkg:/security/sudo \
 	pkg:/shell/pipe-viewer \
 	pkg:/system/zones/internal
