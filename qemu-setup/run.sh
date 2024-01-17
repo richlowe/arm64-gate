@@ -1,5 +1,11 @@
 #!/bin/sh
 
+QEMU_SCRIPT_MACHINE="${QEMU_SCRIPT_MACHINE:-virt-4.1}"
+QEMU_SCRIPT_MEMORY="${QEMU_SCRIPT_MEMORY:-6g}"
+QEMU_SCRIPT_NCPU="${QEMU_SCRIPT_NCPU:-2}"
+QEMU_SCRIPT_CPU="${QEMU_SCRIPT_CPU:-cortex-a53}"
+QEMU_SCRIPT_ACCEL="${QEMU_SCRIPT_ACCEL:-tcg,thread=multi}"
+
 vnic=braich0
 
 mac=`dladm show-vnic -p -o MACADDRESS $vnic | \
@@ -8,11 +14,11 @@ mac=`dladm show-vnic -p -o MACADDRESS $vnic | \
 
 exec qemu-system-aarch64 \
      -nographic \
-     -machine virt-4.1 \
-     -accel tcg,thread=multi \
-     -m 6g \
-     -smp cores=2 \
-     -cpu cortex-a53 \
+     -machine "${QEMU_SCRIPT_MACHINE}" \
+     -accel "${QEMU_SCRIPT_ACCEL}" \
+     -m ${QEMU_SCRIPT_MEMORY} \
+     -smp cores="${QEMU_SCRIPT_NCPU}" \
+     -cpu "${QEMU_SCRIPT_CPU}" \
      -kernel inetboot.bin \
      -append "-D /virtio_mmio@a003c00" \
      -netdev vnic,ifname=braich0,id=net0 \
