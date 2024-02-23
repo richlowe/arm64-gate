@@ -113,7 +113,7 @@ download-illumos-gate: FRC
 	git clone -b arm64-gate https://github.com/richlowe/illumos-gate
 
 download-u-boot: $(SRCS)
-	git clone --shallow-since=2019-01-01 -b v2022.10 \
+	git clone --shallow-since=2019-01-01 -b v2023.01 \
 	    https://github.com/u-boot/u-boot $(SRCS)/u-boot
 	cd $(SRCS)/u-boot && patch -p1 < $(PWD)/patches/u-boot.patch
 
