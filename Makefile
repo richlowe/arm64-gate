@@ -115,7 +115,8 @@ download-illumos-gate: FRC
 download-u-boot: $(SRCS)
 	git clone --shallow-since=2019-01-01 -b v2022.10 \
 	    https://github.com/u-boot/u-boot $(SRCS)/u-boot
-	cd $(SRCS)/u-boot && patch -p1 < $(PWD)/patches/u-boot.patch
+	cd $(SRCS)/u-boot && patch -p1 < $(PWD)/patches/u-boot-rpi4.patch
+	cd $(SRCS)/u-boot && patch -p1 < $(PWD)/patches/u-boot-version.patch
 
 download-arm-trusted-firmware: $(SRCS)
 	  git clone --depth=1 --branch v2.9.0 \
