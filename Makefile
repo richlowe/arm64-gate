@@ -110,7 +110,7 @@ download-gcc: $(SRCS)
 	    https://github.com/richlowe/gcc $(SRCS)/gcc
 
 download-binutils-gdb: $(SRCS)
-	git clone --shallow-since=2019-01-01 -b illumos-arm64 \
+	git clone --shallow-since=2019-01-01 -b illumos-arm64-2-41 \
 	    https://github.com/richlowe/binutils-gdb $(SRCS)/binutils-gdb
 
 download-illumos-gate: FRC
@@ -180,6 +180,7 @@ $(STAMPS)/binutils-gdb-stamp: $(STAMPS)/sysroot-stamp
 	$(SRCS)/binutils-gdb/configure \
 	    --with-sysroot \
 	    --target=aarch64-unknown-solaris2.11 \
+	    --with-gmp-include="$(GMPINCDIR)" \
 	    --prefix=$(CROSS) \
 	    --enable-initfini-array && \
 	gmake -j $(MAX_JOBS) CPPFLAGS+='-I$(GMPINCDIR)' && \
