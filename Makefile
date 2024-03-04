@@ -72,7 +72,8 @@ SYSROOT_PKGS=						\
 	pkg:/system/library/dbus			\
 	pkg:/system/library/libdbus-glib		\
 	pkg:/system/library/mozilla-nss			\
-	pkg:/system/management/snmp/net-snmp
+	pkg:/system/management/snmp/net-snmp		\
+	pkg:/runtime/python-311
 
 DOWNLOADS=			\
 	arm-trusted-firmware	\
