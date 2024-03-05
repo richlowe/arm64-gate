@@ -1,3 +1,7 @@
+# This prevents GNU make from being able to parse this Makefile. Otherwise, it
+# mostly works but with a couple of surprising differences.
+$(NOSUCH) GNU_MAKE_CANNOT_PARSE_THIS +=
+
 # The directory where downloaded source is extracted
 SRCS=$(PWD)/src
 
