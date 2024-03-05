@@ -102,6 +102,8 @@ else
 	exit 2
 fi
 
+triple=aarch64-unknown-solaris2.11
+
 export i386_PRIMARY_CC=gcc10,$i386_GNUC_ROOT/bin/gcc,gnu
 export i386_PRIMARY_CCC=gcc10,$i386_GNUC_ROOT/bin/g++,gnu
 export i386_SHADOW_CCS=gcc7,$i386_GNUC_7_ROOT/bin/gcc,gnu
@@ -109,16 +111,16 @@ export i386_SHADOW_CCCS=gcc7,$i386_GNUC_7_ROOT/bin/g++,gnu
 
 export aarch64_CROSS=${CODEMGR_WS}/../build/cross/
 export aarch64_GNUC_ROOT=${aarch64_CROSS}
-export aarch64_PRIMARY_CC=gcc10,$aarch64_GNUC_ROOT/bin/aarch64-unknown-solaris2.11-gcc,gnu
-export aarch64_PRIMARY_CCC=gcc10,$aarch64_GNUC_ROOT/bin/aarch64-unknown-solaris2.11-g++,gnu
+export aarch64_PRIMARY_CC=gcc10,$aarch64_GNUC_ROOT/bin/$triple-gcc,gnu
+export aarch64_PRIMARY_CCC=gcc10,$aarch64_GNUC_ROOT/bin/$triple-g++,gnu
 
 export aarch64_SYSROOT=${CODEMGR_WS}/../build/sysroot/
 
 if [[ ${MACH} == "aarch64" ]]; then
 	export ADJUNCT_PROTO=${aarch64_SYSROOT}
-	export GLD=${aarch64_CROSS}/bin/aarch64-unknown-solaris2.11-ld
-	export OBJCOPY=${aarch64_CROSS}/bin/aarch64-unknown-solaris2.11-objcopy
-	export ANSI_CPP=${aarch64_CROSS}/bin/aarch64-unknown-solaris2.11-cpp
+	export GLD=${aarch64_CROSS}/bin/$triple-ld
+	export OBJCOPY=${aarch64_CROSS}/bin/$triple-objcopy
+	export ANSI_CPP=${aarch64_CROSS}/bin/$triple-cpp
 	export MKIMAGE=${CODEMGR_WS}/../build/u-boot/tools/mkimage
 	export DTC=${aarch64_CROSS}/bin/dtc
 fi
@@ -130,20 +132,6 @@ fi
 
 ONNV_BUILDNUM=$(date +%Y%m%d%H%M);		export ONNV_BUILDNUM
 PKGVERS_BRANCH=999999.$(date +%Y.%-m.%-e.%-H.%-M);	export PKGVERS_BRANCH
-
-# Only OmniOS has a fixed pkgdepend right now, and only bloody dated after
-# April 2023
-if [[ ! -f /etc/versions/build.illumos-omnios ]]; then
-	export SUPPRESSPKGDEP=true
-else
-	awk -F= '$1 == "BUILD_ID" { gsub("\\.", " ", $2); print $2 }'  \
-	    /etc/os-release | read major minor year month day;
-
-	if (( ($major < 151045) ||
-	    (($major == 151045) && ((${year}${month} < 202304))) )); then
-		export SUPPRESSPKGDEP=true
-	fi
-fi
 
 # Comment this out to disable support for SMB printing, i.e. if you
 # don't want to bother providing the CUPS headers this needs.
@@ -173,10 +161,11 @@ export BUILDPERL32='#'
 #export PYTHON3_VERSION=3.5
 #export PYTHON3_PKGVERS=-35
 #export PYTHON3_SUFFIX=m
-for v in 3.9 3.10 3.11; do
-	[ -x /usr/bin/python$v ] || continue
-	export PYTHON3_VERSION=$v
-	export PYTHON3_PKGVERS=-${v//./}
+for v in {12..9}; do
+	[ -x /usr/bin/python3.$v ] || continue
+	PYTHON3_MINOR=$v
+	export PYTHON3_VERSION=3.$v
+	export PYTHON3_PKGVERS=-3$v
 	break
 done
 
@@ -193,6 +182,31 @@ fi
 
 # Populates /etc/versions/build on each nightly run
 export BUILDVERSION_EXEC="git describe --all --long --dirty"
+
+# Only OmniOS has a fixed pkgdepend right now, and only bloody dated after
+# April 2023
+if [[ ! -f /etc/versions/build.illumos-omnios ]]; then
+	export SUPPRESSPKGDEP=true
+else
+	awk -F= '$1 == "BUILD_ID" { gsub("\\.", " ", $2); print $2 }'  \
+	    /etc/os-release | read major minor year month day;
+
+	if (( ($major < 151045) ||
+	    (($major == 151045) && ((${year}${month} < 202304))) )); then
+		export SUPPRESSPKGDEP=true
+	fi
+
+	# With the migration to Python 3.12 in OmniOS, the names of shared
+	# libraries became qualified with the arch triple. We need a version
+	# of OmniOS that supports cross-pkgdepend in this world, and we need to
+	# set the appropriate environment variable.
+	if (( PYTHON3_MINOR >= 12 &&
+	    (major < 151049 || year < 2024 || month < 3) )); then
+		export SUPPRESSPKGDEP=true
+	else
+		export PKG_CROSS_DEPEND=${triple%.*}
+	fi
+fi
 
 # -----------------------------------------------------------------------------
 # You are less likely to need to modify parameters below.
