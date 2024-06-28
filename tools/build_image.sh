@@ -123,9 +123,7 @@ TZ=UTC
 # Import all the services ahead of time.  This is a shame, because allowing
 # EMI to happen has found many bugs, but it also takes _forever_
 SVCCFG=illumos-gate/usr/src/tools/proto/root_i386-nd/opt/onbld/bin/i386/svccfg
-if [[ ! -x $SVCCFG ]]; then
-	SVCCFG=illumos-gate/usr/src/cmd/svc/svccfg/svccfg-native
-fi
+SVCCFG_CONFIGD_PATH=illumos-gate/usr/src/tools/proto/root_i386-nd/opt/onbld/bin/i386/svc.configd
 SVCCFG_REPOSITORY=/tmp/arm-gate.$$
 
 cp $ROOT/lib/svc/seed/global.db $SVCCFG_REPOSITORY
