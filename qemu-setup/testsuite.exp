@@ -1,0 +1,76 @@
+#!/usr/bin/env expect -f
+
+# Run a large subset of the illumos test suites, automatically, in (by
+# default semi-randomly configured) QEMU.
+#
+# Suites that are skipped are usually either inoperative in an isolated
+# default environment or inoperative in general on ARM (XXX: or forgotten)
+#
+# XXX: At the present time suites have known failures not marked as such, as a
+# sort of bad way to make it clear they fail and should not.  There is, at
+# present, no list of these.  You'll want to establish your own baseline
+#
+# These are sorted in a rough order based on their run-time v. their utility,
+# aiming to fail quickly (so libc is not unimportant, it's just very slow).
+set suites {
+    "/opt/os-tests/bin/ostest"
+    "/opt/libsec-tests/bin/libsectest"
+    "/opt/nvme-tests/bin/unit"
+    "/opt/elf-tests/bin/elftest"
+    "/opt/util-tests/bin/utiltest"
+    "/opt/crypto-tests/bin/cryptotest"
+    "/opt/libc-tests/bin/libctest"
+}
+
+set cpus {
+    "cortex-a53"
+    "cortex-a57"
+    "cortex-a72"
+    "cortex-a76"
+    "cortex-a710"
+    "neoverse-n1"
+    "neoverse-n2"
+    "neoverse-v1"
+}
+
+# We, perhaps unwisely, track "virt".
+set machs {
+    "virt"
+    "virt,gic-version=3"
+}
+
+# Return a random element of the list `l`
+proc lrandom { l } {
+    return [lindex $l [expr { int(rand() * [llength $l]) } ]]
+}
+
+# Pick a random CPU from those we support, unless one was chosen explicitly.
+# This seems like the best shot we have at finding any bug _eventually_
+# without spending days per-time
+if { ![info exists ::env(QEMU_SCRIPT_CPU)] } {
+    set ::env(QEMU_SCRIPT_CPU) [lrandom $cpus]
+}
+
+# As above, but for machine-level options.
+if { ![info exists ::env(QEMU_SCRIPT_MACHINE)] } {
+    set ::env(QEMU_SCRIPT_MACHINE) [lrandom $machs]
+}
+
+puts [format "Machine: %s" $::env(QEMU_SCRIPT_MACHINE)]
+puts [format "CPU:     %s" $::env(QEMU_SCRIPT_CPU)]
+
+set logf [open "testsuite.log" "a+"]
+log_file -open $logf
+
+set timeout -1
+
+spawn ./run.sh
+expect "console login: " { send "root\r" }
+
+foreach suite $suites {
+    expect "# " { send "$suite\r" }
+}
+
+expect "# " { send "poweroff\r" }
+expect eof
+exit 0
