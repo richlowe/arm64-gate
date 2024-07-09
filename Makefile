@@ -116,13 +116,15 @@ download-binutils-gdb: $(SRCS)
 download-illumos-gate: FRC
 	git clone -b arm64-gate https://github.com/richlowe/illumos-gate
 
+UBOOTVER=v2024.07
 download-u-boot: $(SRCS)
-	git clone --shallow-since=2019-01-01 -b v2023.01 \
+	git clone --shallow-since=2019-01-01 -b $(UBOOTVER) \
 	    https://github.com/u-boot/u-boot $(SRCS)/u-boot
 	cd $(SRCS)/u-boot && patch -p1 < $(PWD)/patches/u-boot.patch
 
+ARMFWVER=lts-v2.10.4
 download-arm-trusted-firmware: $(SRCS)
-	  git clone --depth=1 --branch v2.9.0 \
+	  git clone --depth=1 --branch $(ARMFWVER) \
 	      https://github.com/ARM-software/arm-trusted-firmware \
 	      $(SRCS)/arm-trusted-firmware
 
@@ -130,7 +132,7 @@ download-barn: $(SRCS)
 	curl -fLo $(SRCS)/barn.c \
 	    https://github.com/omniosorg/kayak/raw/master/src/barn.c
 
-RPIFWVER=1.20230405
+RPIFWVER=1.20240529
 download-rpi-firmware: $(ARCHIVES) $(SRCS)
 	wget -O $(ARCHIVES)/firmware-$(RPIFWVER).tar.gz \
 	    https://github.com/raspberrypi/firmware/archive/refs/tags/$(RPIFWVER).tar.gz
@@ -329,7 +331,7 @@ $(STAMPS)/arm-trusted-firmware-stamp: $(STAMPS)/gcc-stamp $(STAMPS)/dtc-stamp
 	CROSS_COMPILE=$(CROSS)/bin/aarch64-unknown-solaris2.11- \
 	DTC=$(CROSS)/bin/dtc \
 	gmake -C $(BUILDS)/arm-trusted-firmware -j $(MAX_JOBS) \
-	    PLAT=rpi4 DEBUG=1 bl31 && \
+	    PLAT=rpi4 DEBUG=1 SMC_PCI_SUPPORT=1 bl31 && \
 	touch $@
 
 barn: $(STAMPS)/barn-stamp
