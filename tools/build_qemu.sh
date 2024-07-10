@@ -82,4 +82,4 @@ sudo zpool export $POOL
 sudo lofiadm -d $DISK
 cp illumos-gate/proto/root_aarch64/platform/QEMU,virt-4.1/inetboot.bin \
     qemu-setup
-
+cp build/u-boot-qemu/u-boot.bin qemu-setup

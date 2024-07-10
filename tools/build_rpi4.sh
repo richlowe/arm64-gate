@@ -66,7 +66,7 @@ cp illumos-gate/proto/root_aarch64/platform/RaspberryPi,4/inetboot $boot/
 
 cp build/arm-trusted-firmware/build/rpi4/debug/bl31.bin $boot/
 
-cp build/u-boot/u-boot.bin $boot/
+cp build/u-boot-rpi4/u-boot.bin $boot/
 
 for f in \
 	COPYING.linux \

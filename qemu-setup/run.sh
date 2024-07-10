@@ -19,6 +19,7 @@ exec qemu-system-aarch64 \
      -m ${QEMU_SCRIPT_MEMORY} \
      -smp cores="${QEMU_SCRIPT_NCPU}" \
      -cpu "${QEMU_SCRIPT_CPU}" \
+     -bios u-boot.bin \
      -kernel inetboot.bin \
      -append "-D /virtio_mmio@a003c00" \
      -netdev vnic,ifname=braich0,id=net0 \
