@@ -58,7 +58,8 @@ SETUP_TARGETS =			\
 	sgs			\
 	sysroot			\
 	u-boot			\
-	u-boot-rpi4
+	u-boot-rpi4		\
+	u-boot-qemu
 
 SYSROOT_PUBLISHER=	omnios
 EXTRA_PUBLISHERS=	extra.omnios
@@ -321,10 +322,20 @@ $(STAMPS)/u-boot-stamp: $(STAMPS)/sysroot-stamp
 
 u-boot-rpi4: $(STAMPS)/u-boot-rpi4-stamp
 $(STAMPS)/u-boot-rpi4-stamp: $(STAMPS)/u-boot-stamp $(STAMPS)/gcc-stamp
-	gmake -C $(SRCS)/u-boot V=1 O=$(BUILDS)/u-boot \
+	mkdir -p $(BUILDS)/u-boot-rpi4
+	gmake -C $(SRCS)/u-boot V=1 O=$(BUILDS)/u-boot-rpi4 \
 	    $(U_BOOT_ARGS) \
 	    CROSS_COMPILE=$(CROSS)/bin/aarch64-unknown-solaris2.11- \
 	    ARCH=arm rpi_4_defconfig u-boot u-boot.bin && \
+	touch $@
+
+u-boot-qemu: $(STAMPS)/u-boot-qemu-stamp
+$(STAMPS)/u-boot-qemu-stamp: $(STAMPS)/u-boot-stamp $(STAMPS)/gcc-stamp
+	mkdir -p $(BUILDS)/u-boot-qemu
+	gmake -C $(SRCS)/u-boot V=1 O=$(BUILDS)/u-boot-qemu \
+	    $(U_BOOT_ARGS) \
+	    CROSS_COMPILE=$(CROSS)/bin/aarch64-unknown-solaris2.11- \
+	    ARCH=arm qemu_arm64_defconfig u-boot u-boot.bin && \
 	touch $@
 
 arm-trusted-firmware: $(STAMPS)/arm-trusted-firmware-stamp
