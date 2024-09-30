@@ -185,7 +185,7 @@ export BUILDVERSION_EXEC="git describe --all --long --dirty"
 
 # Only OmniOS has a fixed pkgdepend right now, and only bloody dated after
 # April 2023
-if [[ ! -f /etc/versions/build.illumos-omnios ]]; then
+if [[ $(awk -F= '$1 == "NAME" { print $2 }' /etc/os-release) != '"OmniOS"' ]]; then
 	export SUPPRESSPKGDEP=true
 else
 	awk -F= '$1 == "BUILD_ID" { gsub("\\.", " ", $2); print $2 }'  \
