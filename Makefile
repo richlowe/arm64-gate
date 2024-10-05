@@ -90,8 +90,8 @@ DOWNLOADS=			\
 	rpi-firmware		\
 	u-boot
 
-PERLVER=5.38.0
-PERLCROSSVER=1.5
+PERLVER=5.40.0
+PERLCROSSVER=1.6
 PERLMAJVER.cmd= echo $(PERLVER) | cut -d. -f1,2
 PERLMAJVER= $(PERLMAJVER.cmd:sh)
 download-perl: $(ARCHIVES) $(SRCS)
