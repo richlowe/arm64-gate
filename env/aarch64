@@ -141,7 +141,7 @@ PKGVERS_BRANCH=999999.$(date +%Y.%-m.%-e.%-H.%-M);	export PKGVERS_BRANCH
 # contains your new defaults OR your .env file sets them.
 # These are how you would override for building on OmniOS r151028, for
 # example.
-export PERL_VERSION=5.38
+export PERL_VERSION=5.40
 export PERL_PKGVERS=
 
 if [[ ${MACH} == "aarch64" ]]; then
