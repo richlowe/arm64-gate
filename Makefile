@@ -116,7 +116,7 @@ download-binutils-gdb: $(SRCS)
 download-illumos-gate: FRC
 	git clone -b arm64-gate https://github.com/richlowe/illumos-gate
 
-UBOOTVER=v2024.07
+UBOOTVER=v2024.10
 download-u-boot: $(SRCS)
 	git clone --shallow-since=2019-01-01 -b $(UBOOTVER) \
 	    https://github.com/u-boot/u-boot $(SRCS)/u-boot
@@ -304,7 +304,8 @@ $(STAMPS)/perl-stamp: $(STAMPS)/gcc-stamp
 U_BOOT_ARGS =							\
 	HOSTCC="gcc -m64"					\
 	HOSTCFLAGS="-I/opt/ooce/include"			\
-	HOSTLDLIBS="-L/opt/ooce/lib/amd64 -lnsl -lsocket"
+	HOSTLDLIBS="-L/opt/ooce/lib/amd64 -lnsl -lsocket"	\
+	NO_PYTHON=1
 
 u-boot: $(STAMPS)/u-boot-stamp
 $(STAMPS)/u-boot-stamp: $(STAMPS)/sysroot-stamp
