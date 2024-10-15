@@ -87,7 +87,7 @@ sudo touch $ROOT/reconfigure
 
 # Without mdb(8) or kmdb(8) kmem debugging is much less useful, and much too
 # slow in the emulator.  This is KMF_DEADBEEF|KMF_REDZONE
-echo "set kmem_flags = 0x6" | sudo tee -a $ROOT/etc/system > /dev/null
+#echo "set kmem_flags = 0x6" | sudo tee -a $ROOT/etc/system > /dev/null
 
 # Don't require passwords
 sudo sed -i 's/PASSREQ=YES/PASSREQ=NO/' $ROOT/etc/default/login

@@ -77,11 +77,11 @@ platform (likely qemu) out of the proto area, and supply them to `qemu`
 I use something like this:
 
 ```
-sudo qemu-system-aarch64 -nographic -machine virt-4.1 -m 2g -smp 2 -cpu cortex-a53 -kernel inetboot.bin -append "-D /virtio_mmio@a003c00" -netdev vnic,ifname=braich0,id=net0 -device virtio-net-device,netdev=net0,mac=52:54:00:70:0a:e4 -device virtio-blk-device,drive=hd0 -drive file=$PWD/illumos-disk.img,format=raw,id=hd0,if=none
+sudo qemu-system-aarch64 -nographic -machine virt -m 2g -smp 2 -cpu cortex-a53 -kernel inetboot.bin -append "-D /virtio_mmio@a003c00" -netdev vnic,ifname=braich0,id=net0 -device virtio-net-device,netdev=net0,mac=52:54:00:70:0a:e4 -device virtio-blk-device,drive=hd0 -drive file=$PWD/illumos-disk.img,format=raw,id=hd0,if=none
 ```
 
 - `-nographic` -- serial console on stdout
-- `-machine virt-4.1` -- the current target qemu machine
+- `-machine virt` -- the current target qemu machine
 - `-m 2g` -- 2G of memory, more can never hurt
 - `-smp 2` -- 2 CPUs, again, more shouldn't hurt
 - `-cpu cortex-a53` -- an appropriate CPU for the port

@@ -80,6 +80,6 @@ sudo zfs set mountpoint=none $POOL
 sudo zpool export $POOL
 
 sudo lofiadm -d $DISK
-cp illumos-gate/proto/root_aarch64/platform/QEMU,virt-4.1/inetboot.bin \
+cp illumos-gate/proto/root_aarch64/platform/QEMU,virt/inetboot.bin \
     qemu-setup
 
