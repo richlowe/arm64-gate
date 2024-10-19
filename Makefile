@@ -185,7 +185,7 @@ $(STAMPS)/binutils-gdb-stamp: $(STAMPS)/sysroot-stamp
 	    --with-gmp-include="$(GMPINCDIR)" \
 	    --prefix=$(CROSS) \
 	    --enable-initfini-array && \
-	gmake -j $(MAX_JOBS) CPPFLAGS+='-I$(GMPINCDIR)' && \
+	gmake -j $(MAX_JOBS) -L CPPFLAGS+='-I/usr/xpg4/include -I$(GMPINCDIR)' && \
 	gmake -j $(MAX_JOBS) install) && \
 	touch $@
 
