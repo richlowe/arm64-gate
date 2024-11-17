@@ -162,7 +162,7 @@ rm -f $SVCCFG_REPOSITORY
 	    -dlrDJN \
 	    -relaxed-filenames \
 	    -o ./platform/armv8/boot_archive \
-	    $(cat $filelist)
+	    -path-list $filelist
 
 	sudo $WORKDIR/build/barn -R $ROOT -w $filelist
 
