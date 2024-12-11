@@ -111,8 +111,8 @@ export i386_SHADOW_CCCS=gcc14,$i386_GNUC_14_ROOT/bin/g++,gnu
 
 export aarch64_CROSS=${CODEMGR_WS}/../build/cross/
 export aarch64_GNUC_ROOT=${aarch64_CROSS}
-export aarch64_PRIMARY_CC=gcc10,$aarch64_GNUC_ROOT/bin/$triple-gcc,gnu
-export aarch64_PRIMARY_CCC=gcc10,$aarch64_GNUC_ROOT/bin/$triple-g++,gnu
+export aarch64_PRIMARY_CC=gcc14,$aarch64_GNUC_ROOT/bin/$triple-gcc,gnu
+export aarch64_PRIMARY_CCC=gcc14,$aarch64_GNUC_ROOT/bin/$triple-g++,gnu
 
 export aarch64_SYSROOT=${CODEMGR_WS}/../build/sysroot/
 

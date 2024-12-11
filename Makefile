@@ -106,7 +106,7 @@ download-perl: $(ARCHIVES) $(SRCS)
 	    patch -p1 < $(PWD)/patches/perl-nanosleep.patch
 
 download-gcc: $(SRCS)
-	git clone --shallow-since=2019-01-01 -b il-10_4_0-arm64 \
+	git clone --shallow-since=2019-01-01 -b il-14_2_0-arm64 \
 	    https://github.com/richlowe/gcc $(SRCS)/gcc
 
 download-binutils-gdb: $(SRCS)
