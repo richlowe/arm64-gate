@@ -141,7 +141,7 @@ download-rpi-firmware: $(ARCHIVES) $(SRCS)
 
 # XXXARM: We specify what we extract, because the release tarball contains a
 # GNU tar-ism we don't understand.
-DTCVER=1.7.1
+DTCVER=1.7.2
 download-dtc: $(ARCHIVES)
 	wget -O $(ARCHIVES)/dtc-$(DTCVER).tar.gz \
 	    https://git.kernel.org/pub/scm/utils/dtc/dtc.git/snapshot/dtc-$(DTCVER).tar.gz
