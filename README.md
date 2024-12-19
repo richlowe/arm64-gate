@@ -8,21 +8,21 @@ development of the AArch64 port.
 
 - An illumos system
 - A compilation environment, headers, compiler, etc.
-  (You will need both GCC 7, GCC 10, and their dependencies and build
+  (You will need both GCC 10, GCC 14, and their dependencies and build
   dependencies to include at least GMP, MPC, and MPFR):
   ```sh
   # Run this in OmniOS:
   sudo pkg install \
-	pkg:/developer/gcc7 \
 	pkg:/developer/gcc10 \
+	pkg:/developer/gcc14 \
 	pkg:/developer/pkg-config \
 	pkg:/ooce/library/gnutls \
 	pkg:/ooce/text/texinfo
 
   # Run this in OpenIndiana:
   sudo pkg install \
-	pkg:/developer/gcc-7 \
 	pkg:/developer/gcc-10 \
+	pkg:/developer/gcc-14 \
 	pkg:/developer/build/pkg-config \
 	pkg:/library/gnutls-3 \
 	pkg:/text/texinfo
