@@ -92,13 +92,13 @@ else
 fi
 
 # OmniOS, etc.
-if [[ -d /opt/gcc-7 ]]; then
-	export i386_GNUC_7_ROOT=/opt/gcc-7
+if [[ -d /opt/gcc-14 ]]; then
+	export i386_GNUC_14_ROOT=/opt/gcc-14
 # OpenIndiana etc.
-elif [[ -d /usr/gcc/7 ]]; then
-	export i386_GNUC_7_ROOT=/usr/gcc/7
+elif [[ -d /usr/gcc/14 ]]; then
+	export i386_GNUC_14_ROOT=/usr/gcc/14
 else
-	print -u2 "I can't work out where your native GCC 7 is!"
+	print -u2 "I can't work out where your native GCC 14 is!"
 	exit 2
 fi
 
@@ -106,8 +106,8 @@ triple=aarch64-unknown-solaris2.11
 
 export i386_PRIMARY_CC=gcc10,$i386_GNUC_ROOT/bin/gcc,gnu
 export i386_PRIMARY_CCC=gcc10,$i386_GNUC_ROOT/bin/g++,gnu
-export i386_SHADOW_CCS=gcc7,$i386_GNUC_7_ROOT/bin/gcc,gnu
-export i386_SHADOW_CCCS=gcc7,$i386_GNUC_7_ROOT/bin/g++,gnu
+export i386_SHADOW_CCS=gcc14,$i386_GNUC_14_ROOT/bin/gcc,gnu
+export i386_SHADOW_CCCS=gcc14,$i386_GNUC_14_ROOT/bin/g++,gnu
 
 export aarch64_CROSS=${CODEMGR_WS}/../build/cross/
 export aarch64_GNUC_ROOT=${aarch64_CROSS}
