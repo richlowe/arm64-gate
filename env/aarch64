@@ -161,7 +161,7 @@ export BUILDPERL32='#'
 #export PYTHON3_VERSION=3.5
 #export PYTHON3_PKGVERS=-35
 #export PYTHON3_SUFFIX=m
-for v in {12..9}; do
+for v in {13..9}; do
 	[ -x /usr/bin/python3.$v ] || continue
 	PYTHON3_MINOR=$v
 	export PYTHON3_VERSION=3.$v
