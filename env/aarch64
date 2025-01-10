@@ -201,7 +201,7 @@ else
 	# of OmniOS that supports cross-pkgdepend in this world, and we need to
 	# set the appropriate environment variable.
 	if (( PYTHON3_MINOR >= 12 &&
-	    (major < 151049 || year < 2024 || month < 3) )); then
+	    (major < 151049 || ((${year}${month} < 202403))) )); then
 		export SUPPRESSPKGDEP=true
 	else
 		if [[ ${MACH} != ${NATIVE_MACH} ]]; then
