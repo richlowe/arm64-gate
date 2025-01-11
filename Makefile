@@ -116,13 +116,13 @@ download-binutils-gdb: $(SRCS)
 download-illumos-gate: FRC
 	git clone -b arm64-gate https://github.com/richlowe/illumos-gate
 
-UBOOTVER=v2024.10
+UBOOTVER=v2025.01
 download-u-boot: $(SRCS)
 	git clone --shallow-since=2019-01-01 -b $(UBOOTVER) \
 	    https://github.com/u-boot/u-boot $(SRCS)/u-boot
 	cd $(SRCS)/u-boot && patch -p1 < $(PWD)/patches/u-boot.patch
 
-ARMFWVER=lts-v2.10.4
+ARMFWVER=lts-v2.10.11
 download-arm-trusted-firmware: $(SRCS)
 	  git clone --depth=1 --branch $(ARMFWVER) \
 	      https://github.com/ARM-software/arm-trusted-firmware \
@@ -132,7 +132,7 @@ download-barn: $(SRCS)
 	curl -fLo $(SRCS)/barn.c \
 	    https://github.com/omniosorg/kayak/raw/master/src/barn.c
 
-RPIFWVER=1.20240529
+RPIFWVER=1.20241126
 download-rpi-firmware: $(ARCHIVES) $(SRCS)
 	wget -O $(ARCHIVES)/firmware-$(RPIFWVER).tar.gz \
 	    https://github.com/raspberrypi/firmware/archive/refs/tags/$(RPIFWVER).tar.gz

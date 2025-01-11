@@ -76,11 +76,11 @@ for f in \
 	start4cd.elf \
 	bcm2711-rpi-4-b.dtb
 do
-	cp src/firmware-1.*/boot/$f $boot/
+	cp src/firmware-1.20*/boot/$f $boot/
 done
 
 mkdir -p $boot/overlays
-cp src/firmware-1.*/boot/overlays/* $boot/overlays
+cp src/firmware-1.20*/boot/overlays/* $boot/overlays
 
 mkfile $DISKSIZE $DISK
 BLK_DEVICE=$(sudo lofiadm -la $DISK)
