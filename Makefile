@@ -109,8 +109,11 @@ download-gcc: $(SRCS)
 	git clone --shallow-since=2019-01-01 -b il-14_2_0-arm64 \
 	    https://github.com/richlowe/gcc $(SRCS)/gcc
 
+BINUTILSVER=2.43.1
+BINUTILSVERDASH.cmd= echo $(BINUTILSVER) | tr . -
+BINUTILSVERDASH= $(BINUTILSVERDASH.cmd:sh)
 download-binutils-gdb: $(SRCS)
-	git clone --shallow-since=2019-01-01 -b illumos-arm64-2-41 \
+	git clone --shallow-since=2019-01-01 -b illumos-arm64-$(BINUTILSVERDASH) \
 	    https://github.com/richlowe/binutils-gdb $(SRCS)/binutils-gdb
 
 download-illumos-gate: FRC
