@@ -161,13 +161,28 @@ export BUILDPERL32='#'
 #export PYTHON3_VERSION=3.5
 #export PYTHON3_PKGVERS=-35
 #export PYTHON3_SUFFIX=m
-for v in {13..9}; do
-	[ -x /usr/bin/python3.$v ] || continue
-	PYTHON3_MINOR=$v
-	export PYTHON3_VERSION=3.$v
-	export PYTHON3_PKGVERS=-3$v
-	break
-done
+if [[ ${MACH} == ${NATIVE_MACH} ]]; then
+	for v in {13..9}; do
+		[ -x /usr/bin/python3.$v ] || continue
+		PYTHON3_MINOR=$v
+		break
+	done
+else
+	for v in {13..9}; do
+		[ -r $aarch64_SYSROOT/usr/include/python3.$v/Python.h ] \
+		    || continue
+		PYTHON3_MINOR=$v
+		break
+	done
+
+	if [ ! -x /usr/bin/python3.$PYTHON3_MINOR ]; then
+		print -u2 "The detected Python version 3.$PYTHON3_MINOR in" \
+		    "the sysroot is not installed on the host!"
+		exit 2
+	fi
+fi
+export PYTHON3_VERSION=3.$PYTHON3_MINOR
+export PYTHON3_PKGVERS=-3$PYTHON3_MINOR
 
 # Skip Java 11 builds on distributions that don't support it
 if [[ -d "/usr/jdk/instances/openjdk11.0" ]]; then
