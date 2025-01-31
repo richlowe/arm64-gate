@@ -46,6 +46,7 @@ rm -rf $boot
 mkdir -p $boot
 
 cat <<EOM > $boot/config.txt
+arm_boost=1
 gpu_mem=16
 start_file=start4cd.elf
 fixup_file=fixup4cd.dat
