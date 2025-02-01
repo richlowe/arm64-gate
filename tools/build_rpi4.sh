@@ -63,7 +63,11 @@ enable_uart=1
 dtoverlay=disable-bt
 EOM
 
-cp illumos-gate/proto/root_aarch64/platform/RaspberryPi,4/inetboot $boot/
+INETBOOT="illumos-gate/proto/root_aarch64/platform/raspberrypi,4-model-b/inetboot"
+if [ ! -f "${INETBOOT}" ]; then
+	INETBOOT="illumos-gate/proto/root_aarch64/platform/RaspberryPi,4/inetboot"
+fi
+cp "${INETBOOT}" $boot/
 
 cp build/arm-trusted-firmware/build/rpi4/debug/bl31.bin $boot/
 

@@ -15,4 +15,4 @@ end
 
 
 file illumos-gate/usr/src/psm/stand/boot/aarch64/virt/inetboot.out
-file illumos-gate/proto/root_aarch64/platform/QEMU,virt/kernel/aarch64/unix
+file illumos-gate/proto/root_aarch64/platform/linux,dummy-virt/kernel/aarch64/unix
