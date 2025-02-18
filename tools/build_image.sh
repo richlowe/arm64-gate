@@ -156,19 +156,20 @@ rm -f $SVCCFG_REPOSITORY
 		[ -e "$file" ] && find "$file" -type f
 	done | awk '{printf("/%s=./%s\n", $1, $1)}' > $filelist
 
+	sudo mkdir -p ./platform/armv8/aarch64
 	sudo mkisofs \
 	    -quiet \
 	    -graft-points \
 	    -dlrDJN \
 	    -relaxed-filenames \
-	    -o ./platform/armv8/boot_archive \
+	    -o ./platform/armv8/aarch64/boot_archive \
 	    -path-list $filelist
 
 	sudo $WORKDIR/build/barn -R $ROOT -w $filelist
 
 	/usr/bin/sed -i 's/=\./=/' $filelist
-	sudo cp $filelist ./platform/armv8/archive_cache
-	sudo chmod 644 ./platform/armv8/archive_cache
+	sudo cp $filelist ./platform/armv8/aarch64/archive_cache
+	sudo chmod 644 ./platform/armv8/aarch64/archive_cache
 	rm -f $filelist
 
 	sudo touch ./boot/solaris/timestamp.cache
