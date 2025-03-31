@@ -120,6 +120,7 @@ if [[ ${MACH} == "aarch64" ]]; then
 	export ADJUNCT_PROTO=${aarch64_SYSROOT}
 	export GLD=${aarch64_CROSS}/bin/$triple-ld
 	export OBJCOPY=${aarch64_CROSS}/bin/$triple-objcopy
+	export OBJDUMP=${aarch64_CROSS}/bin/$triple-objdump
 	export ANSI_CPP=${aarch64_CROSS}/bin/$triple-cpp
 	export MKIMAGE=${CODEMGR_WS}/../build/u-boot/tools/mkimage
 	export DTC=${aarch64_CROSS}/bin/dtc

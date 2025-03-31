@@ -378,10 +378,10 @@ $(PWD)/out/illumos.zfs: $(STAMPS)/illumos-stamp
 	ksh tools/build_image.sh
 
 qemu-disk: $(PWD)/out/illumos.zfs
-	ksh tools/build_qemu.sh --efi
+	ksh tools/build_qemu.sh
 
 rpi4-disk: $(PWD)/out/illumos.zfs
-	ksh tools/build_rpi4.sh --efi
+	ksh tools/build_rpi4.sh
 
 disk: qemu-disk rpi4-disk
 
