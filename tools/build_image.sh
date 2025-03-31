@@ -169,6 +169,13 @@ rm -f $SVCCFG_REPOSITORY
 	sudo touch ./boot/solaris/timestamp.cache
 )
 
+# drop a boot config override into the loader configs to allow booting
+# from an implementation architecture and to prefer the serial console
+echo 'bootfile="/platform/${IMPLARCH}/kernel/${ISADIR}/unix;/platform/${BASEARCH}/kernel/${ISADIR}/unix"' | \
+    sudo tee $ROOT/boot/conf.d/00-aarch64-defaults.conf >/dev/null
+echo 'console="${default-uart-name},text"' | \
+    sudo tee -a $ROOT/boot/conf.d/00-aarch64-defaults.conf >/dev/null
+
 sudo zfs snapshot $DATASET@image
 mkdir -p out
 sudo zfs send $DATASET@image | pv > out/illumos.zfs

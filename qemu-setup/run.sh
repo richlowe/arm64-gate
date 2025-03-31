@@ -20,8 +20,6 @@ exec qemu-system-aarch64 \
      -smp cores="${QEMU_SCRIPT_NCPU}" \
      -cpu "${QEMU_SCRIPT_CPU}" \
      -bios u-boot.bin \
-     -kernel inetboot.bin \
-     -append "-D /virtio_mmio@a003c00" \
      -netdev vnic,ifname=braich0,id=net0 \
      -device virtio-net-device,netdev=net0,mac=${mac} \
      -device virtio-blk-device,drive=hd0 \
