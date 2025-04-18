@@ -21,12 +21,6 @@ zfs list $DATASET >/dev/null 2>&1 && sudo zfs destroy -r $DATASET
 sudo zfs create -o mountpoint=$ROOT $DATASET
 trap 'sudo zfs destroy -r $DATASET' EXIT
 
-# for reasons I can't fathom, synthetic packages don't get published right now
-pkgsend publish -s illumos-gate/packages/aarch64/nightly/repo.redist \
-    illumos-gate/usr/src/pkg/packages.aarch64/osnet-incorporation.mog
-pkgsend publish -s illumos-gate/packages/aarch64/nightly/repo.redist \
-    illumos-gate/usr/src/pkg/packages.aarch64/osnet-redist.mog
-
 # Setting this flag lets `pkg` know that this is an automatic installation and
 # that the installed packages should not be marked as 'manually installed'
 # in the pkg database.
