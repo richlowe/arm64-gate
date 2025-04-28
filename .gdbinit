@@ -18,5 +18,4 @@ define devinfo
   printf "binding: %s\n", ((struct dev_info *)$arg0)->devi_binding_name
 end
 
-file illumos-gate/usr/src/psm/stand/boot/aarch64/virt/inetboot.out
 file illumos-gate/proto/root_aarch64/platform/armv8/kernel/aarch64/unix
