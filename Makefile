@@ -179,6 +179,9 @@ $(STAMPS)/sysroot-stamp:
 	pkg -R $(SYSROOT) install $(SYSROOT_PKGS) && \
 	touch $@
 
+update-sysroot: $(STAMPS)/sysroot-stamp
+	pkg -R $(SYSROOT) update
+
 binutils-gdb: $(STAMPS)/binutils-gdb-stamp
 $(STAMPS)/binutils-gdb-stamp: $(STAMPS)/sysroot-stamp
 	mkdir -p $(BUILDS)/binutils-gdb && \
