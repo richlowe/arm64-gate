@@ -118,7 +118,7 @@ download-binutils-gdb: $(SRCS)
 	    https://github.com/richlowe/binutils-gdb $(SRCS)/binutils-gdb
 
 download-illumos-gate: FRC
-	git clone -b arm64-gate https://github.com/richlowe/illumos-gate
+	git clone -b arm64-gate https://github.com/mintyray/illumos-gate
 
 UBOOTVER=v2025.01
 download-u-boot: $(SRCS)
@@ -387,6 +387,9 @@ rpi4-disk: $(PWD)/out/illumos.zfs
 	ksh tools/build_rpi4.sh
 
 disk: qemu-disk rpi4-disk
+
+nfs: illumos
+	ksh tools/build_nfs.sh
 
 $(BUILDS):
 	mkdir -p $@
