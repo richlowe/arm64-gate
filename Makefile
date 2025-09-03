@@ -91,8 +91,8 @@ DOWNLOADS=			\
 	rpi-firmware		\
 	u-boot
 
-PERLVER=5.40.0
-PERLCROSSVER=1.6
+PERLVER=5.42.0
+PERLCROSSVER=1.6.2
 PERLMAJVER.cmd= echo $(PERLVER) | cut -d. -f1,2
 PERLMAJVER= $(PERLMAJVER.cmd:sh)
 download-perl: $(ARCHIVES) $(SRCS)
@@ -104,7 +104,8 @@ download-perl: $(ARCHIVES) $(SRCS)
 	/bin/tar -xf $(ARCHIVES)/perl-cross-$(PERLCROSSVER).tar.gz -C $(SRCS)
 	rsync -a $(SRCS)/perl-cross-$(PERLCROSSVER)/* $(SRCS)/perl-$(PERLVER)/
 	cd $(SRCS)/perl-$(PERLVER) && \
-	    patch -p1 < $(PWD)/patches/perl-nanosleep.patch
+	    patch -p1 < $(PWD)/patches/perl-configure.patch && \
+	    patch -p1 < $(PWD)/patches/perl-5.42.0.patch
 
 download-gcc: $(SRCS)
 	git clone --shallow-since=2019-01-01 -b il-14_2_0-arm64 \
