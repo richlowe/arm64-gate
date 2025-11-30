@@ -1,17 +1,3 @@
-diff --git a/board/raspberrypi/rpi/rpi.c b/board/raspberrypi/rpi/rpi.c
-index 18be244aa7..c9aa8fb86f 100644
---- a/board/raspberrypi/rpi/rpi.c
-+++ b/board/raspberrypi/rpi/rpi.c
-@@ -344,9 +344,6 @@ static void set_fdtfile(void)
-  */
- static void set_fdt_addr(void)
- {
--	if (env_get("fdt_addr"))
--		return;
--
- 	if (fdt_magic(fw_dtb_pointer) != FDT_MAGIC)
- 		return;
- 
 diff --git a/board/raspberrypi/rpi/rpi.env b/board/raspberrypi/rpi/rpi.env
 index 30228285ed..016f6d3869 100644
 --- a/board/raspberrypi/rpi/rpi.env
