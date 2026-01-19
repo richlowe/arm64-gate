@@ -18,6 +18,7 @@ set suites {
     "/opt/libsec-tests/bin/libsectest"
     "/opt/nvme-tests/bin/unit"
     "/opt/elf-tests/bin/elftest"
+    "/opt/i2c-tests/bin/i2c-test"
     "/opt/util-tests/bin/utiltest"
     "/opt/crypto-tests/bin/cryptotest"
     "/opt/libc-tests/bin/libctest"
@@ -65,8 +66,9 @@ log_file -open $logf
 
 set timeout -1
 
-spawn ./run.sh
+spawn ./run-pci-boot.sh
 expect "console login: " { send "root\r" }
+expect "# " { send "env TERM=dumb bash\r" }
 
 foreach suite $suites {
     expect "# " { send "$suite\r" }
