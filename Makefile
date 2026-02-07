@@ -108,7 +108,7 @@ download-perl: $(ARCHIVES) $(SRCS)
 	    patch -p1 < $(PWD)/patches/perl-5.42.0.patch
 
 download-gcc: $(SRCS)
-	git clone --shallow-since=2019-01-01 -b il-14_2_0-arm64 \
+	git clone --shallow-since=2019-01-01 -b il-14_3_0-arm64 \
 	    https://github.com/richlowe/gcc $(SRCS)/gcc
 
 BINUTILSVER=2.43.1
