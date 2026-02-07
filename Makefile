@@ -181,7 +181,7 @@ $(STAMPS)/sysroot-stamp:
 	touch $@
 
 update-sysroot: $(STAMPS)/sysroot-stamp
-	pkg -R $(SYSROOT) update
+	PKG_SUCCESS_ON_NOP=1 pkg -R $(SYSROOT) update
 
 binutils-gdb: $(STAMPS)/binutils-gdb-stamp
 $(STAMPS)/binutils-gdb-stamp: $(STAMPS)/sysroot-stamp
