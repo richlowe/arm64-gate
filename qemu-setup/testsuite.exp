@@ -69,6 +69,7 @@ set timeout -1
 spawn ./run-pci-boot.sh
 expect "console login: " { send "root\r" }
 expect "# " { send "env TERM=dumb bash\r" }
+expect "# " { send "/lib/svc/bin/settle\r" }
 
 foreach suite $suites {
     expect "# " { send "$suite\r" }
