@@ -16,6 +16,7 @@ set suites {
     "/opt/os-tests/bin/ostest"
     "/opt/libproc-tests/bin/libproctest"
     "/opt/libsec-tests/bin/libsectest"
+    "/opt/tz-tests/bin/tz-test"
     "/opt/nvme-tests/bin/unit"
     "/opt/elf-tests/bin/elftest"
     "/opt/i2c-tests/bin/i2c-test"
