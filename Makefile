@@ -91,8 +91,8 @@ DOWNLOADS=			\
 	rpi-firmware		\
 	u-boot
 
-PERLVER=5.42.0
-PERLCROSSVER=1.6.2
+PERLVER=5.44.0
+PERLCROSSVER=1.6.4
 PERLMAJVER.cmd= echo $(PERLVER) | cut -d. -f1,2
 PERLMAJVER= $(PERLMAJVER.cmd:sh)
 download-perl: $(ARCHIVES) $(SRCS)
@@ -105,7 +105,7 @@ download-perl: $(ARCHIVES) $(SRCS)
 	rsync -a $(SRCS)/perl-cross-$(PERLCROSSVER)/* $(SRCS)/perl-$(PERLVER)/
 	cd $(SRCS)/perl-$(PERLVER) && \
 	    patch -p1 < $(PWD)/patches/perl-configure.patch && \
-	    patch -p1 < $(PWD)/patches/perl-5.42.0.patch
+	    patch -p1 < $(PWD)/patches/perl-5.44.0.patch
 
 download-gcc: $(SRCS)
 	git clone --shallow-since=2019-01-01 -b il-14_3_0-arm64 \
