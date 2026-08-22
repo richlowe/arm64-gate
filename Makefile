@@ -188,6 +188,7 @@ $(STAMPS)/binutils-gdb-stamp: $(STAMPS)/sysroot-stamp
 	mkdir -p $(BUILDS)/binutils-gdb && \
 	(cd $(BUILDS)/binutils-gdb && \
 	$(SRCS)/binutils-gdb/configure \
+	    CFLAGS='-std=gnu17' \
 	    --with-sysroot \
 	    --target=aarch64-unknown-solaris2.11 \
 	    --with-gmp-include="$(GMPINCDIR)" \
